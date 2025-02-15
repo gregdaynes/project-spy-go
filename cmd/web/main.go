@@ -6,12 +6,14 @@ import (
 	"log/slog"
 	"net/http"
 	"os"
+	"text/template"
 	"time"
 )
 
 type application struct {
-	debug  bool
-	logger *slog.Logger
+	debug         bool
+	logger        *slog.Logger
+	templateCache map[string]*template.Template
 }
 
 func main() {
@@ -29,9 +31,16 @@ func main() {
 
 	logger := slog.New(slog.NewJSONHandler(os.Stdout, &slogHandlerOptions))
 
+	templateCache, err := newTemplateCache()
+	if err != nil {
+		logger.Error(err.Error())
+		os.Exit(1)
+	}
+
 	app := &application{
-		debug:  *debug,
-		logger: logger,
+		debug:         *debug,
+		logger:        logger,
+		templateCache: templateCache,
 	}
 
 	tlsConfig := &tls.Config{
@@ -50,7 +59,7 @@ func main() {
 	}
 
 	logger.Info("starting server", slog.String("addr", *addr))
-	err := srv.ListenAndServeTLS("./tls/cert.pem", "./tls/key.pem")
+	err = srv.ListenAndServeTLS("./tls/cert.pem", "./tls/key.pem")
 	logger.Error(err.Error())
 	os.Exit(1)
 }
