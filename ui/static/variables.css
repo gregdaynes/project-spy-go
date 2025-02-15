@@ -1,0 +1,37 @@
+:root {
+  /* @link https://utopia.fyi/type/calculator?c=320,16,1.125,1440,20,1.125,5,2,&s=0.75|0.5|0.25,1.5|2|3|4|6,s-l&g=s,l,xl,12 */
+  --step--1: clamp(0.8889rem, 0.8254rem + 0.3175vw, 1.1111rem);
+  --step-0: clamp(1rem, 0.9286rem + 0.3571vw, 1.25rem);
+  --step-1: clamp(1.125rem, 1.0446rem + 0.4018vw, 1.4063rem);
+  --step-2: clamp(1.2656rem, 1.1752rem + 0.452vw, 1.582rem);
+  --step-3: clamp(1.4238rem, 1.3221rem + 0.5085vw, 1.7798rem);
+  --step-4: clamp(1.6018rem, 1.4874rem + 0.5721vw, 2.0023rem);
+
+  /* @link https://utopia.fyi/space/calculator?c=320,16,1.2,1440,20,1.25,5,2,&s=0.75|0.5|0.25,1.5|2|3|4|6,s-l&g=s,l,xl,12 */
+  --s-2xs: clamp(0.5rem, 0.4643rem + 0.1786vw, 0.625rem);
+  --s-xs: clamp(0.75rem, 0.6964rem + 0.2679vw, 0.9375rem);
+  --s-s: clamp(1rem, 0.9286rem + 0.3571vw, 1.25rem);
+  --s-m: clamp(1.5rem, 1.3929rem + 0.5357vw, 1.875rem);
+}
+
+:root {
+  --font-display: Bahnschrift, 'DIN Alternate', 'Franklin Gothic Medium', 'Nimbus Sans Narrow', sans-serif-condensed, sans-serif;
+  --font-base: Bahnschrift, 'DIN Alternate', 'Franklin Gothic Medium', 'Nimbus Sans Narrow', sans-serif-condensed, sans-serif;
+  --font-mono: ui-monospace, 'Cascadia Code', 'Source Code Pro', Menlo, Consolas, 'DejaVu Sans Mono', monospace;
+
+  --font-medium: 600;
+  --font-medium: 400;
+
+  --leading-fine: 1.1;
+  --leading-standard: 1.5;
+
+  --color-highlight: #ff0;
+  --color-mid: #999;
+  --color-primary: dodgerblue;
+  --color-focus: dodgerblue;
+  --focus-offset: 0.2lh;
+
+  --border-thin: 0.0675rem;
+  --stroke: var(--border-thin) solid;
+}
+

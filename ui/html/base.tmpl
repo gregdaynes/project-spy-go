@@ -5,7 +5,32 @@
 		<meta charset="utf-8" >
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<meta name="color-scheme" content="dark light">
-		<link rel="stylesheet" href="/static/reset.css">
+
+		<title></title>
+
+		<link rel="stylesheet" href="/static/app.css">
+		<link rel="manifest" href="/manifest.json">
+		<script type="importmap">
+			{
+	"imports": {
+	  "filter.js": "/static/filter.js",
+	  "confirm-dialog.js": "/statuc/confirm-dialog.js",
+	  "task-dialog.js": "/static/task-dialog.js",
+	  "info-dialog.js": "/static/info-dialog.js"
+	}
+  }
+		</script>
+		<script type="module" src="/static/app.js"></script>
+		<script type="module">
+			if ('serviceWorker' in navigator) {
+  try {
+	const registration = await navigator.serviceWorker.register('/static/sw.js')
+  } catch (err) {
+	console.error('Error during service worker registration:', e);
+  }
+}
+		</script>
+
 	</head>
 	<body>
 		{{template "main" .}}
