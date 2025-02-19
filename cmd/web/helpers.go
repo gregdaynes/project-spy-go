@@ -8,12 +8,6 @@ import (
 	"runtime/debug"
 )
 
-func (app *application) newTemplateData(r *http.Request) templateData {
-	return templateData{
-		message: "Hello, world!",
-	}
-}
-
 func (app *application) render(w http.ResponseWriter, r *http.Request, status int, page string, data templateData) {
 	templateSet, ok := app.templateCache[page]
 	if !ok {

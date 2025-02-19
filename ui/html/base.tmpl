@@ -12,28 +12,35 @@
 		<link rel="manifest" href="/manifest.json">
 		<script type="importmap">
 			{
-	"imports": {
-	  "filter.js": "/static/filter.js",
-	  "confirm-dialog.js": "/statuc/confirm-dialog.js",
-	  "task-dialog.js": "/static/task-dialog.js",
-	  "info-dialog.js": "/static/info-dialog.js"
-	}
-  }
+				"imports": {
+				  "filter.js": "/static/filter.js",
+				  "confirm-dialog.js": "/statuc/confirm-dialog.js",
+				  "task-dialog.js": "/static/task-dialog.js",
+				  "info-dialog.js": "/static/info-dialog.js"
+				}
+			  }
 		</script>
 		<script type="module" src="/static/app.js"></script>
 		<script type="module">
 			if ('serviceWorker' in navigator) {
-  try {
-	const registration = await navigator.serviceWorker.register('/static/sw.js')
-  } catch (err) {
-	console.error('Error during service worker registration:', e);
-  }
-}
+				try {
+					const registration = await navigator.serviceWorker.register('/static/sw.js')
+				} catch (err) {
+					console.error('Error during service worker registration:', e);
+				}
+			}
 		</script>
-
 	</head>
 	<body>
-		{{template "main" .}}
+		<application-header>
+			<h1>ProjectSpy</h1>
+		</application-header>
+
+		<application-wrapper>
+			<main>
+				{{template "main" .}}
+			</main>
+		</application-wrapper>
 	</body>
 </html>
 {{end}}

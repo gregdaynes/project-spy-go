@@ -1,7 +1,9 @@
 package main
 
 import (
+	"fmt"
 	"io/fs"
+	"net/http"
 	"path/filepath"
 	"text/template"
 
@@ -9,10 +11,20 @@ import (
 )
 
 type templateData struct {
-	message string
+	message   string
+	TaskLanes TaskLanes
 }
 
 var functions = template.FuncMap{}
+
+func (app *application) newTemplateData(r *http.Request) templateData {
+	fmt.Println(r)
+
+	return templateData{
+		message:   "Hello, world!",
+		TaskLanes: app.taskLanes,
+	}
+}
 
 func newTemplateCache() (map[string]*template.Template, error) {
 	cache := map[string]*template.Template{}

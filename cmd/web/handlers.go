@@ -11,6 +11,7 @@ func ping(w http.ResponseWriter, r *http.Request) {
 
 func (app *application) home(w http.ResponseWriter, r *http.Request) {
 	data := app.newTemplateData(r)
+	data.TaskLanes = app.taskLanes
 
 	app.render(w, r, http.StatusOK, "home.tmpl", data)
 }

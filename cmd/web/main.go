@@ -14,6 +14,7 @@ type application struct {
 	debug         bool
 	logger        *slog.Logger
 	templateCache map[string]*template.Template
+	taskLanes     map[string]TaskLane
 }
 
 func main() {
@@ -37,10 +38,18 @@ func main() {
 		os.Exit(1)
 	}
 
+	// setup task lanes
+	taskLanes, err := newTaskLanes()
+	if err != nil {
+		logger.Error(err.Error())
+		os.Exit(1)
+	}
+
 	app := &application{
 		debug:         *debug,
 		logger:        logger,
 		templateCache: templateCache,
+		taskLanes:     taskLanes,
 	}
 
 	tlsConfig := &tls.Config{

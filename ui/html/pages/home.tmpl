@@ -1,3 +1,5 @@
 {{define "main"}}
-Hello! world!
+	{{range .TaskLanes}}
+		{{ .Name }}
+	{{end}}
 {{end}}
