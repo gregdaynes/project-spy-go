@@ -3,11 +3,14 @@ package main
 import (
 	"crypto/tls"
 	"flag"
+	"fmt"
 	"log/slog"
 	"net/http"
 	"os"
 	"text/template"
 	"time"
+
+	"github.com/fsnotify/fsnotify"
 )
 
 type application struct {
@@ -15,6 +18,7 @@ type application struct {
 	logger        *slog.Logger
 	templateCache map[string]*template.Template
 	taskLanes     map[string]TaskLane
+	watcher       *fsnotify.Watcher
 }
 
 func main() {
@@ -45,11 +49,19 @@ func main() {
 		os.Exit(1)
 	}
 
+	watcher := setupWatcher(taskLanes)
+	defer watcher.Close()
+
+	listTasks(taskLanes)
+
+	fmt.Println(taskLanes)
+
 	app := &application{
 		debug:         *debug,
 		logger:        logger,
 		templateCache: templateCache,
 		taskLanes:     taskLanes,
+		watcher:       watcher,
 	}
 
 	tlsConfig := &tls.Config{
