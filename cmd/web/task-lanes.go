@@ -18,19 +18,6 @@ type TaskLane struct {
 	Count int
 }
 
-type Tasks []Task
-
-type Task struct {
-	Name            string
-	ID              string
-	Title           string
-	Lane            string
-	DescriptionHTML string
-	Tags            []string
-	Priority        int
-	Actions         []string
-}
-
 func newTaskLanes() (TaskLanes, error) {
 	var taskLanes = make(TaskLanes)
 
@@ -48,30 +35,6 @@ func newTaskLanes() (TaskLanes, error) {
 	}
 
 	return taskLanes, nil
-}
-
-func listTasks(lanes TaskLanes) {
-	for k, lane := range lanes {
-		entries, err := os.ReadDir(".projectSpy/" + lane.Slug)
-		if err != nil {
-			log.Fatal(err)
-		}
-
-		tasks := []Task{}
-
-		for _, e := range entries {
-			fmt.Println(e.Name())
-
-			tasks = append(tasks, Task{
-				Name: e.Name(),
-			})
-
-			lane.Tasks = tasks
-		}
-
-		lane.Count = len(lane.Tasks)
-		lanes[k] = lane
-	}
 }
 
 func setupWatcher(lanes TaskLanes) *fsnotify.Watcher {
@@ -103,7 +66,6 @@ func setupWatcher(lanes TaskLanes) *fsnotify.Watcher {
 	}()
 
 	for k, lane := range lanes {
-		// Add a path.
 		err = watcher.Add(".projectSpy/" + lane.Name)
 		if err != nil {
 			log.Fatal(err)
