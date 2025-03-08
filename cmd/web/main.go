@@ -50,7 +50,6 @@ func main() {
 	}
 
 	watcher := setupWatcher(taskLanes)
-	defer watcher.Close()
 
 	listTasks(taskLanes)
 

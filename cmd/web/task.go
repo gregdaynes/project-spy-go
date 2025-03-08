@@ -7,7 +7,7 @@ import (
 	"time"
 )
 
-type Tasks []Task
+type Tasks map[string]Task
 
 type Task struct {
 	Name            string
@@ -39,23 +39,29 @@ func listTasks(lanes TaskLanes) {
 			log.Fatal(err)
 		}
 
-		tasks := []Task{}
+		tasks := make(Tasks)
 
 		for _, e := range entries {
 			fmt.Println(e.Name())
+
+			name := ".projectSpy/" + lane.Slug + "/" + e.Name()
 
 			task, err := parseFile(".projectSpy/" + lane.Slug + "/" + e.Name())
 			if err != nil {
 				log.Fatal(err)
 			}
 
-			task.Actions = append(task.Actions, Action{Label: "View", Key: "view"})
+			prepareActions(&task)
 
-			tasks = append(tasks, task)
+			tasks[name] = task
 		}
 
 		lane.Tasks = tasks
 		lane.Count = len(lane.Tasks)
 		lanes[k] = lane
 	}
+}
+
+func prepareActions(task *Task) {
+	task.Actions = append(task.Actions, Action{Label: "View", Key: "view"})
 }

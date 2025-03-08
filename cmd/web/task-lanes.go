@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strings"
 
 	"github.com/fsnotify/fsnotify"
 )
@@ -51,11 +52,35 @@ func setupWatcher(lanes TaskLanes) *fsnotify.Watcher {
 					return
 				}
 
-				fmt.Println("event:", event.Op, event.Name)
+				// TODO this is brittle.
+				laneName := strings.Split(event.Name, "/")[1]
 
-				// if event.Has(fsnotify.Write) {
-				// 	log.Println("modified file:", event.Name)
-				// }
+				if event.Has(fsnotify.Create) || event.Has(fsnotify.Write) {
+					// fmt.Println("created file:", event.Name)
+					lane, ok := lanes[laneName]
+					if !ok {
+						log.Fatal("lane not found", laneName)
+					}
+
+					taskInList, ok := lane.Tasks[event.Name]
+					if ok {
+						fmt.Println("taskInList found", taskInList, event.Name)
+						delete(lane.Tasks, event.Name)
+					}
+
+					task, err := parseFile(event.Name)
+					if err != nil {
+						log.Fatal(err)
+					}
+
+					prepareActions(&task)
+
+					lanes[laneName].Tasks[event.Name] = task
+				}
+
+				if event.Has(fsnotify.Rename) || event.Has(fsnotify.Remove) {
+					delete(lanes[laneName].Tasks, event.Name)
+				}
 			case err, ok := <-watcher.Errors:
 				if !ok {
 					return
