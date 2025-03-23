@@ -8,7 +8,7 @@ import (
 	"runtime/debug"
 )
 
-func (app *application) render(w http.ResponseWriter, r *http.Request, status int, page string, data templateData) {
+func (app *application) render(w http.ResponseWriter, r *http.Request, status int, page string, data any) {
 	templateSet, ok := app.templateCache[page]
 	if !ok {
 		err := fmt.Errorf("the template %s does not exist", page)

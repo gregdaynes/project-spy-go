@@ -25,6 +25,7 @@ func parseFile(fp string) (task Task, err error) {
 
 	for scanner.Scan() {
 		text := strings.TrimSpace(scanner.Text())
+		task.RawContents = task.RawContents + "\n" + text
 
 		if text == "" {
 			ds = true
@@ -76,8 +77,8 @@ func parseFile(fp string) (task Task, err error) {
 
 	strs := strings.Split(relative, "/")
 
-	task.Lane = strs[0]
-	task.Filename = strs[1]
+	task.Lane = strs[1]
+	task.Filename = strs[2]
 
 	return task, nil
 }

@@ -1,28 +1,64 @@
 package main
 
 import (
-	"fmt"
 	"io/fs"
 	"net/http"
 	"path/filepath"
 	"text/template"
+	"time"
 
 	"projectspy.dev/ui"
 )
 
 type templateData struct {
-	message   string
-	TaskLanes TaskLanes
+	message     string
+	TaskLanes   map[string]ViewLaneModel
+	CurrentTask ViewTaskModel
+	ShowTask    bool
+}
+
+type ViewLaneModel struct {
+	Name     string
+	Slug     string
+	Tasks    map[string]ViewTaskModel
+	Count    int
+	Selected bool
+}
+
+type ViewTaskModel struct {
+	Name            string
+	ID              string
+	Lane            string
+	Title           string
+	Body            string
+	DescriptionHTML string
+	Description     string
+	Priority        int
+	Tags            []string
+	FullPath        string
+	RelativePath    string
+	Filename        string
+	ModifiedTime    time.Time
+	CreatedTime     time.Time
+	Order           int
+	ShowDetails     bool
+	Actions         map[string]ViewActionModel
+	AvailableLanes  map[string]ViewLaneModel
+}
+
+type ViewActionModel struct {
+	Label  string
+	Name   string
+	Method string
+	Action string
 }
 
 var functions = template.FuncMap{}
 
 func (app *application) newTemplateData(r *http.Request) templateData {
-	fmt.Println(r)
-
 	return templateData{
 		message:   "Hello, world!",
-		TaskLanes: app.taskLanes,
+		TaskLanes: make(map[string]ViewLaneModel),
 	}
 }
 
@@ -39,7 +75,7 @@ func newTemplateCache() (map[string]*template.Template, error) {
 
 		patterns := []string{
 			"html/base.tmpl",
-			// "html/partials/*.tmpl",
+			"html/partials/*.tmpl",
 			page,
 		}
 

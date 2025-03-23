@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"os"
 	"strings"
@@ -38,6 +37,32 @@ func newTaskLanes() (TaskLanes, error) {
 	return taskLanes, nil
 }
 
+func listTasks(lanes TaskLanes) {
+	for k, lane := range lanes {
+		entries, err := os.ReadDir(".projectSpy/" + lane.Slug)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		tasks := make(Tasks)
+
+		for _, e := range entries {
+			//name := ".projectSpy/" + lane.Slug + "/" + e.Name()
+
+			task, err := parseFile(".projectSpy/" + lane.Slug + "/" + e.Name())
+			if err != nil {
+				log.Fatal(err)
+			}
+
+			tasks[e.Name()] = task
+		}
+
+		lane.Tasks = tasks
+		lane.Count = len(lane.Tasks)
+		lanes[k] = lane
+	}
+}
+
 func setupWatcher(lanes TaskLanes) *fsnotify.Watcher {
 	watcher, err := fsnotify.NewWatcher()
 	if err != nil {
@@ -56,15 +81,13 @@ func setupWatcher(lanes TaskLanes) *fsnotify.Watcher {
 				laneName := strings.Split(event.Name, "/")[1]
 
 				if event.Has(fsnotify.Create) || event.Has(fsnotify.Write) {
-					// fmt.Println("created file:", event.Name)
 					lane, ok := lanes[laneName]
 					if !ok {
 						log.Fatal("lane not found", laneName)
 					}
 
-					taskInList, ok := lane.Tasks[event.Name]
+					_, ok = lane.Tasks[event.Name]
 					if ok {
-						fmt.Println("taskInList found", taskInList, event.Name)
 						delete(lane.Tasks, event.Name)
 					}
 
@@ -73,7 +96,7 @@ func setupWatcher(lanes TaskLanes) *fsnotify.Watcher {
 						log.Fatal(err)
 					}
 
-					prepareActions(&task)
+					// prepareActions(&task)
 
 					lanes[laneName].Tasks[event.Name] = task
 				}

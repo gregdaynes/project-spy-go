@@ -1,0 +1,75 @@
+{{define "task"}}
+<task-dialog>
+  <dialog open>
+    <dialog-wrapper>
+      <header>
+        {{ if .Title }}
+          <h3>{{ .Title }}</h3>
+        {{ else }}
+          <fieldset>
+            <label for="name">New task name</label>
+            <input type="text" name="name" id="name" form="updateForm" placeholder="My task to be done">
+          </fieldset>
+        {{ end }}
+
+        <form id="task-dialog-close" method="get" action="/">
+          <button type="submit" class="icon close"><svg xmlns="http://www.w3.org/2000/svg" aria-label="Close task" fill="currentColor" viewBox="0 0 384 512"><path d="M342.6 150.6a32 32 0 0 0-45.3-45.3L192 210.7 86.6 105.4a32 32 0 0 0-45.3 45.3L146.7 256 41.4 361.4a32 32 0 0 0 45.3 45.3L192 301.3l105.4 105.3a32 32 0 0 0 45.3-45.3L237.3 256l105.3-105.4z"/></svg></button>
+        </form>
+      </header>
+
+      <dialog-main>
+        <textarea name="content" id="content" form="updateForm">{{ .Body }}</textarea>
+      </dialog-main>
+
+      {{ if .ShowDetails }}
+      <dialog-details>
+        {{ if .Priority }}
+          <task-priority>
+            Priority {{ .Priority }}
+          </task-priority>
+        {{end}}
+
+        {{ if .Tags }}
+          <task-tags>
+            {{ range .Tags }}
+              <task-tag>{{ . }}</task-tag>
+            {{ end }}
+          </task-tags>
+        {{ end }}
+      </dialog-details>
+      {{ end }}
+
+      <footer>
+        <form id="updateForm" method="<%= it.task.actions.update.method %>" action="<%= it.task.actions.update.action %>">
+          <select aria-label="lane" id="lane" name="lane">
+            {{ range .AvailableLanes }}
+            <option value="{{ .Slug }}" {{ if .Selected }}Selected{{end}}>
+              {{ .Name}}
+            </option>
+            {{ end }}
+          </select>
+
+            <button-group>
+              <button type="submit">{{ .Actions.update.Label }}</button>
+
+                <details class="dropdown">
+                  <summary></summary>
+
+
+                  <div>
+                    {{ if .Actions.delete }}
+                    <button type="submit" formmethod="<%= it.task.actions.delete.method %>" formaction="<%= it.task.actions.delete.action %>">{{ .Actions.delete.Label }}</button>
+                    {{end }}
+                    {{ if .Actions.archive }}
+                      <button type="submit" formmethod="<%= it.task.actions.archive.method %>" formaction="<%= it.task.actions.archive.action %>">{{ .Actions.archive.Label }}</button>
+                    {{ end }}
+                  </div>
+                </details>
+            </button-group>
+          </form>
+      </footer>
+    </dialog-wrapper>
+  </dialog>
+</task-dialog>
+
+{{end}}

@@ -3,7 +3,6 @@ package main
 import (
 	"crypto/tls"
 	"flag"
-	"fmt"
 	"log/slog"
 	"net/http"
 	"os"
@@ -52,8 +51,6 @@ func main() {
 	watcher := setupWatcher(taskLanes)
 
 	listTasks(taskLanes)
-
-	fmt.Println(taskLanes)
 
 	app := &application{
 		debug:         *debug,

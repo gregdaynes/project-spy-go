@@ -1,4 +1,5 @@
 {{define "main"}}
+	{{ if .TaskLanes }}
 	<lane-reel>
 		{{range .TaskLanes}}
 			<task-lane>
@@ -19,13 +20,13 @@
 								{{ .DescriptionHTML }}
 
 								{{ range .Tags }}
-									<span>{{ .  }}</span>
+									<span>{{ . }}</span>
 								{{ end }}
 							</task-body>
 
 							<task-footer>
 								{{range .Actions}}
-									<a href="{{ .Key }}">{{ .Label }}</a>
+									<a href="{{ .Action }}">{{ .Label }}</a>
 								{{ end }}
 							</task-footer>
 						</task-l>
@@ -34,4 +35,9 @@
 			</task-lane>
 		{{end}}
 	</lane-reel>
+	{{ end }}
+
+	{{if .ShowTask}}
+	    {{template "task" .CurrentTask}}
+    {{end}}
 {{end}}
