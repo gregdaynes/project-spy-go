@@ -3,9 +3,13 @@ package main
 import (
 	"crypto/tls"
 	"flag"
+	"log"
 	"log/slog"
+	"net"
 	"net/http"
 	"os"
+	"os/exec"
+	"runtime"
 	"text/template"
 	"time"
 
@@ -76,7 +80,32 @@ func main() {
 	}
 
 	logger.Info("starting server", slog.String("addr", *addr))
-	err = srv.ListenAndServeTLS("./tls/cert.pem", "./tls/key.pem")
-	logger.Error(err.Error())
-	os.Exit(1)
+	l, err := net.Listen("tcp", ":8443")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	err = open("https://localhost:8443")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	log.Fatal(srv.ServeTLS(l, "./tls/cert.pem", "./tls/key.pem"))
+}
+
+func open(url string) error {
+	var cmd string
+	var args []string
+
+	switch runtime.GOOS {
+	case "windows":
+		cmd = "cmd"
+		args = []string{"/c", "start"}
+	case "darwin":
+		cmd = "open"
+	default: // "linux", "freebsd", "openbsd", "netbsd"
+		cmd = "xdg-open"
+	}
+	args = append(args, url)
+	return exec.Command(cmd, args...).Start()
 }

@@ -43,10 +43,10 @@ func parseFile(fp string) (task Task, err error) {
 		}
 
 		if ds == false {
-			task.Title += text + "\n"
-			task.Priority = Priority(task.Title)
-			task.Order = Order(task.Title)
-			task.Tags = Tags(task.Title)
+			task.Title += ParseTitle(text)
+			task.Priority = Priority(text)
+			task.Order = Order(text)
+			task.Tags = Tags(text)
 			continue
 		}
 
@@ -111,4 +111,20 @@ func Tags(title string) (tags []string) {
 	}
 
 	return tags
+}
+
+func ParseTitle(title string) (parsedTitle string) {
+	// remove priority
+	r := regexp.MustCompile(`!+`)
+	title = r.ReplaceAllString(title, "")
+
+	// remove order
+	r = regexp.MustCompile(`(\d+)`)
+	title = r.ReplaceAllString(title, "")
+
+	// remove tags
+	r = regexp.MustCompile(`\[([^\]]+)\]`)
+	title = r.ReplaceAllString(title, "")
+
+	return title
 }
