@@ -85,10 +85,12 @@ func main() {
 		log.Fatal(err)
 	}
 
-	err = open("https://localhost:8443")
-	if err != nil {
-		log.Fatal(err)
-	}
+	x()
+
+	// err = open("https://localhost:8443")
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
 
 	log.Fatal(srv.ServeTLS(l, "./tls/cert.pem", "./tls/key.pem"))
 }
