@@ -64,7 +64,7 @@ func listTasks(lanes TaskLanes) {
 	}
 }
 
-func setupWatcher(lanes TaskLanes) *fsnotify.Watcher {
+func setupWatcher(eventBus *EventBus[string], lanes TaskLanes) *fsnotify.Watcher {
 	watcher, err := fsnotify.NewWatcher()
 	if err != nil {
 		log.Fatal(err)
@@ -79,7 +79,9 @@ func setupWatcher(lanes TaskLanes) *fsnotify.Watcher {
 				}
 
 				// TODO this is brittle.
-				laneName := strings.Split(event.Name, "/")[1]
+				name := strings.TrimPrefix(event.Name, ".projectSpy/")
+				laneName := strings.Split(name, "/")[0]
+				filename := strings.Split(name, "/")[1]
 
 				if event.Has(fsnotify.Create) || event.Has(fsnotify.Write) {
 					fmt.Println("create or write", event.Name)
@@ -88,10 +90,11 @@ func setupWatcher(lanes TaskLanes) *fsnotify.Watcher {
 						log.Fatal("lane not found", laneName)
 					}
 
-					_, ok = lane.Tasks[event.Name]
+					_, ok = lane.Tasks[filename]
 					if ok {
-						fmt.Println("deleting", event.Name)
-						delete(lane.Tasks, event.Name)
+						fmt.Println("deleting", laneName, filename)
+						delete(lane.Tasks, filename)
+						eventBus.Publish("delete", filename)
 					}
 
 					task, err := parseFile(event.Name)
@@ -99,7 +102,8 @@ func setupWatcher(lanes TaskLanes) *fsnotify.Watcher {
 						log.Fatal(err)
 					}
 
-					lanes[laneName].Tasks[event.Name] = task
+					lanes[laneName].Tasks[filename] = task
+					eventBus.Publish("update", laneName+"/"+filename)
 				}
 
 				if event.Has(fsnotify.Rename) || event.Has(fsnotify.Remove) {

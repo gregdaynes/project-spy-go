@@ -22,6 +22,7 @@ type application struct {
 	templateCache map[string]*template.Template
 	taskLanes     map[string]TaskLane
 	watcher       *fsnotify.Watcher
+	eventBus      *EventBus[string]
 }
 
 func main() {
@@ -52,7 +53,9 @@ func main() {
 		os.Exit(1)
 	}
 
-	watcher := setupWatcher(taskLanes)
+	eventBus := NewEventBus[string]()
+
+	watcher := setupWatcher(eventBus, taskLanes)
 
 	listTasks(taskLanes)
 
@@ -62,6 +65,7 @@ func main() {
 		templateCache: templateCache,
 		taskLanes:     taskLanes,
 		watcher:       watcher,
+		eventBus:      eventBus,
 	}
 
 	tlsConfig := &tls.Config{
@@ -84,8 +88,6 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-
-	x()
 
 	// err = open("https://localhost:8443")
 	// if err != nil {

@@ -119,7 +119,7 @@ func ParseTitle(title string) (parsedTitle string) {
 	title = r.ReplaceAllString(title, "")
 
 	// remove order
-	r = regexp.MustCompile(`(\d+)`)
+	r = regexp.MustCompile(`(\s\d+)`)
 	title = r.ReplaceAllString(title, "")
 
 	// remove tags
