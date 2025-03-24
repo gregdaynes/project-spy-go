@@ -29,8 +29,10 @@ func (app *application) update(w http.ResponseWriter, r *http.Request) {
 		log.Fatal("file not found")
 	}
 
-	contentHasher := sha1.New()
 	content := r.FormValue("content")
+	newLane := r.FormValue("lane")
+
+	contentHasher := sha1.New()
 	content = strings.ReplaceAll(content, "\r\n", "\n")
 	content = strings.TrimSpace(content)
 
@@ -45,28 +47,43 @@ func (app *application) update(w http.ResponseWriter, r *http.Request) {
 	rawHasher.Write([]byte(rawcontents))
 	rawHash := hex.EncodeToString(rawHasher.Sum(nil))
 
-	if contentHash == rawHash {
+	if contentHash == rawHash && lane == newLane {
 		http.Redirect(w, r, "/view/"+lane+"/"+filename, http.StatusSeeOther)
 		return
 	}
 
-	// get last line of content
-	last := strings.Split(content, "\n")[len(strings.Split(content, "\n"))-1]
-	// regexto detect if it is a changelog entry
-	re := regexp.MustCompile(`\d{4}-\d{2}-\d{2} \d{2}:\d{2}\s.*`)
-	if re.MatchString(last) {
-		// create "yyyy-mm-dd entry" timestamp
+	if contentHash != rawHash {
+		// get last line of content
+		last := strings.Split(content, "\n")[len(strings.Split(content, "\n"))-1]
+		// regexto detect if it is a changelog entry
+		re := regexp.MustCompile(`\d{4}-\d{2}-\d{2} \d{2}:\d{2}\s.*`)
+		if re.MatchString(last) {
+			// create "yyyy-mm-dd entry" timestamp
+			timestamp := time.Now().Format("2006-01-02 15:04")
+			content += "\n" + timestamp + "\tUpdated task"
+		} else {
+			timestamp := time.Now().Format("2006-01-02 15:04")
+			content += "\n\n---\n\n" + timestamp + "\tUpdated task"
+		}
+	}
+
+	if newLane != lane {
+		oldLane := lane
+		oldPath := path
+		path = cwd + "/.projectSpy/" + newLane + "/" + filename
+		// send message to delete old file
+		os.Remove(oldPath)
+		lane = newLane
 		timestamp := time.Now().Format("2006-01-02 15:04")
-		content += "\n" + timestamp + "\tUpdated task"
-	} else {
-		timestamp := time.Now().Format("2006-01-02 15:04")
-		content += "\n\n---\n\n" + timestamp + "\tUpdated task"
+		content += "\n" + timestamp + "\tMoved task from " + oldLane + " to " + newLane
 	}
 
 	ch := make(chan int)
 
 	waitForWrite := func(event string) {
-		ch <- 1
+		if event == lane+"/"+filename {
+			ch <- 1
+		}
 	}
 
 	go func() {

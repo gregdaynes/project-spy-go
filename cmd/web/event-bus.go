@@ -54,30 +54,3 @@ func (eb *EventBus[T]) Publish(eventType EventType, event string) {
 		}
 	}
 }
-
-// func x() {
-// 	// Create a new event bus for string events.
-// 	eventBus := NewEventBus[string]()
-//
-// 	// Define a subscriber function for string events.
-// 	stringSubscriber := func(event string) {
-// 		fmt.Println("Received string event:", event)
-// 	}
-//
-// 	// Subscribe to a specific event type.
-// 	eventBus.Subscribe("stringEvent", &stringSubscriber)
-//
-// 	// Publish a string event.
-// 	eventBus.Publish("stringEvent", "Hello, Event Bus!")
-//
-// 	// Unsubscribe the subscriber.
-// 	// eventBus.Unsubscribe("stringEvent", &stringSubscriber)
-//
-// 	// The subscriber will not receive events after unsubscribing.
-// 	eventBus.Publish("stringEvent", "This event won't be received.")
-//
-// 	// Sleep to allow time for the event bus to finish processing.
-// 	time.Sleep(time.Second)
-//
-// 	eventBus.Publish("stringEvent", "Last event!")
-// }

@@ -58,10 +58,10 @@
 
                   <div>
                     {{ if .Actions.delete }}
-                    <button type="submit" formmethod="<%= it.task.actions.delete.method %>" formaction="<%= it.task.actions.delete.action %>">{{ .Actions.delete.Label }}</button>
+                    <button type="submit" formmethod="{{ .Actions.delete.Method }}" formaction=" {{ .Actions.delete.Action }}">{{ .Actions.delete.Label }}</button>
                     {{end }}
                     {{ if .Actions.archive }}
-                      <button type="submit" formmethod="<%= it.task.actions.archive.method %>" formaction="<%= it.task.actions.archive.action %>">{{ .Actions.archive.Label }}</button>
+                      <button type="submit" formmethod="{{ .Actions.archive.Method }}" formaction="{{ .Actions.archive.Action }}">{{ .Actions.archive.Label }}</button>
                     {{ end }}
                   </div>
                 </details>

@@ -48,8 +48,6 @@ func listTasks(lanes TaskLanes) {
 		tasks := make(Tasks)
 
 		for _, e := range entries {
-			//name := ".projectSpy/" + lane.Slug + "/" + e.Name()
-
 			task, err := parseFile(".projectSpy/" + lane.Slug + "/" + e.Name())
 			if err != nil {
 				log.Fatal(err)
@@ -107,8 +105,9 @@ func setupWatcher(eventBus *EventBus[string], lanes TaskLanes) *fsnotify.Watcher
 				}
 
 				if event.Has(fsnotify.Rename) || event.Has(fsnotify.Remove) {
-					fmt.Println("rename or remove", event.Name)
-					delete(lanes[laneName].Tasks, event.Name)
+					fmt.Println("rename or remove", filename)
+					delete(lanes[laneName].Tasks, filename)
+					eventBus.Publish("remove", laneName+"/"+filename)
 				}
 			case err, ok := <-watcher.Errors:
 				if !ok {
