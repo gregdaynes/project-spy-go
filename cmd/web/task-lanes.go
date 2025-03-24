@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"os"
 	"strings"
@@ -81,6 +82,7 @@ func setupWatcher(lanes TaskLanes) *fsnotify.Watcher {
 				laneName := strings.Split(event.Name, "/")[1]
 
 				if event.Has(fsnotify.Create) || event.Has(fsnotify.Write) {
+					fmt.Println("create or write", event.Name)
 					lane, ok := lanes[laneName]
 					if !ok {
 						log.Fatal("lane not found", laneName)
@@ -88,6 +90,7 @@ func setupWatcher(lanes TaskLanes) *fsnotify.Watcher {
 
 					_, ok = lane.Tasks[event.Name]
 					if ok {
+						fmt.Println("deleting", event.Name)
 						delete(lane.Tasks, event.Name)
 					}
 
@@ -96,12 +99,11 @@ func setupWatcher(lanes TaskLanes) *fsnotify.Watcher {
 						log.Fatal(err)
 					}
 
-					// prepareActions(&task)
-
 					lanes[laneName].Tasks[event.Name] = task
 				}
 
 				if event.Has(fsnotify.Rename) || event.Has(fsnotify.Remove) {
+					fmt.Println("rename or remove", event.Name)
 					delete(lanes[laneName].Tasks, event.Name)
 				}
 			case err, ok := <-watcher.Errors:

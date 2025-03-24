@@ -40,7 +40,7 @@
       {{ end }}
 
       <footer>
-        <form id="updateForm" method="<%= it.task.actions.update.method %>" action="<%= it.task.actions.update.action %>">
+		  <form id="updateForm" method="{{ .Actions.update.Method }}" action="{{ .Actions.update.Action }}">
           <select aria-label="lane" id="lane" name="lane">
             {{ range .AvailableLanes }}
             <option value="{{ .Slug }}" {{ if .Selected }}Selected{{end}}>
