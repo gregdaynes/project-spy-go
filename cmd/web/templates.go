@@ -12,7 +12,7 @@ import (
 
 type templateData struct {
 	message     string
-	TaskLanes   map[string]ViewLaneModel
+	TaskLanes   map[int]ViewLaneModel
 	CurrentTask ViewTaskModel
 	ShowTask    bool
 }
@@ -58,7 +58,7 @@ var functions = template.FuncMap{}
 func (app *application) newTemplateData(r *http.Request) templateData {
 	return templateData{
 		message:   "Hello, world!",
-		TaskLanes: make(map[string]ViewLaneModel),
+		TaskLanes: make(map[int]ViewLaneModel),
 	}
 }
 

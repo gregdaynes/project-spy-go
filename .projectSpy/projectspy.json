@@ -1,0 +1,16 @@
+{
+  "lanes": [
+    {
+      "dir": "backlog",
+      "name": "Backlog"
+    },
+    {
+      "dir": "in-progress",
+      "name": "In Progress"
+    },
+    {
+      "dir": "done",
+      "name": "Done"
+    }
+  ]
+}

@@ -1,2 +1,0 @@
-project-spy config file
----

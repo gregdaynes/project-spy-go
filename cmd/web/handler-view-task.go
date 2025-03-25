@@ -57,8 +57,12 @@ func (app *application) view(w http.ResponseWriter, r *http.Request) {
 
 	data := app.newTemplateData(r)
 
-	for laneKey, lane := range app.taskLanes {
-		data.TaskLanes[laneKey] = ViewLaneModel{
+	lanes := app.config.Lanes
+	for i := 0; i < len(lanes); i++ {
+		dir := lanes[i].Dir
+		lane := app.taskLanes[dir]
+
+		data.TaskLanes[i] = ViewLaneModel{
 			Name:  lane.Name,
 			Slug:  lane.Slug,
 			Tasks: make(map[string]ViewTaskModel),
@@ -74,7 +78,7 @@ func (app *application) view(w http.ResponseWriter, r *http.Request) {
 				Method: http.MethodGet,
 			}
 
-			data.TaskLanes[laneKey].Tasks[task.Filename] = ViewTaskModel{
+			data.TaskLanes[i].Tasks[task.Filename] = ViewTaskModel{
 				Lane:            task.Lane,
 				Title:           task.Title,
 				DescriptionHTML: task.DescriptionHTML,

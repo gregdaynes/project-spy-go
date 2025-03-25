@@ -2,6 +2,7 @@ package main
 
 import (
 	"crypto/tls"
+	"encoding/json"
 	"flag"
 	"log"
 	"log/slog"
@@ -23,6 +24,7 @@ type application struct {
 	taskLanes     map[string]TaskLane
 	watcher       *fsnotify.Watcher
 	eventBus      *EventBus[string]
+	config        *Config
 }
 
 func main() {
@@ -39,6 +41,11 @@ func main() {
 	}
 
 	logger := slog.New(slog.NewJSONHandler(os.Stdout, &slogHandlerOptions))
+
+	config, err := newConfiguration()
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	templateCache, err := newTemplateCache()
 	if err != nil {
@@ -66,6 +73,7 @@ func main() {
 		taskLanes:     taskLanes,
 		watcher:       watcher,
 		eventBus:      eventBus,
+		config:        &config,
 	}
 
 	tlsConfig := &tls.Config{
@@ -112,4 +120,31 @@ func open(url string) error {
 	}
 	args = append(args, url)
 	return exec.Command(cmd, args...).Start()
+}
+
+type ConfigLane struct {
+	Dir  string `json:"dir"`
+	Name string `json:"name"`
+}
+type Config struct {
+	Lanes []ConfigLane `json:"lanes"`
+}
+
+func newConfiguration() (config Config, err error) {
+	cwd, err := os.Getwd()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	file, err := os.ReadFile(cwd + "/.projectSpy/projectspy.json")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	err = json.Unmarshal(file, &config)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return config, nil
 }

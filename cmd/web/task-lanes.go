@@ -33,9 +33,16 @@ func newTaskLanes() (TaskLanes, error) {
 			continue
 		}
 
-		taskLanes[file.Name()] = TaskLane{
-			Slug: file.Name(),
-			Name: file.Name(),
+		if file.Name() == "projectspy.json" {
+			continue
+		}
+
+		isDir := file.IsDir()
+		if isDir == true {
+			taskLanes[file.Name()] = TaskLane{
+				Slug: file.Name(),
+				Name: file.Name(),
+			}
 		}
 	}
 
