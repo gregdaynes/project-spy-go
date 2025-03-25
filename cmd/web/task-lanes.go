@@ -29,6 +29,10 @@ func newTaskLanes() (TaskLanes, error) {
 	}
 
 	for _, file := range files {
+		if file.Name() == "_archive" {
+			continue
+		}
+
 		taskLanes[file.Name()] = TaskLane{
 			Slug: file.Name(),
 			Name: file.Name(),
