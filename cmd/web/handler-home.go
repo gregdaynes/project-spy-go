@@ -1,20 +1,16 @@
 package main
 
 import (
-	"fmt"
 	"net/http"
 )
 
 func (app *application) home(w http.ResponseWriter, r *http.Request) {
 	data := app.newTemplateData(r)
 
-	fmt.Println(app.taskLanes)
 	lanes := app.config.Lanes
 	for i := 0; i < len(lanes); i++ {
 		dir := lanes[i].Dir
 		lane := app.taskLanes[dir]
-
-		fmt.Println(i, dir)
 
 		data.TaskLanes[i] = ViewLaneModel{
 			Name:  lanes[i].Name,
