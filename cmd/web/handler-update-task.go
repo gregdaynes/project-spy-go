@@ -56,7 +56,7 @@ func (app *application) update(w http.ResponseWriter, r *http.Request) {
 		// get last line of content
 		last := strings.Split(content, "\n")[len(strings.Split(content, "\n"))-1]
 		// regexto detect if it is a changelog entry
-		re := regexp.MustCompile(`\d{4}-\d{2}-\d{2} \d{2}:\d{2}\s.*`)
+		re := regexp.MustCompile(`\d{4}-\d{2}-\d{2} \d{2}:\d{2}\t.*`)
 		if re.MatchString(last) {
 			// create "yyyy-mm-dd entry" timestamp
 			timestamp := time.Now().Format("2006-01-02 15:04")
@@ -74,8 +74,15 @@ func (app *application) update(w http.ResponseWriter, r *http.Request) {
 		// send message to delete old file
 		os.Remove(oldPath)
 		lane = newLane
-		timestamp := time.Now().Format("2006-01-02 15:04")
-		content += "\n" + timestamp + "\tMoved task from " + oldLane + " to " + newLane
+		last := strings.Split(content, "\n")[len(strings.Split(content, "\n"))-1]
+		re := regexp.MustCompile(`\d{4}-\d{2}-\d{2} \d{2}:\d{2}\t.*`)
+		if re.MatchString(last) {
+			timestamp := time.Now().Format("2006-01-02 15:04")
+			content += "\n" + timestamp + "\tMoved task from " + oldLane + " to " + newLane
+		} else {
+			timestamp := time.Now().Format("2006-01-02 15:04")
+			content += "\n\n---\n\n" + timestamp + "\tMoved task from " + oldLane + " to " + newLane
+		}
 	}
 
 	ch := make(chan int)
