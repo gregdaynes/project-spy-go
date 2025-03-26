@@ -1,0 +1,3 @@
+reapply filters when reloading
+===
+

@@ -21,7 +21,7 @@ class InfoDialog extends HTMLElement {
     })
 
     document.addEventListener('mouseup', e => {
-      if (event.target !== this.dialog) return
+      if (e.target !== this.dialog) return
 
       this.dialog.close()
     })
