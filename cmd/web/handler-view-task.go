@@ -21,6 +21,17 @@ func getAvailableLanes(t *Task, lanes map[string]TaskLane) map[string]ViewLaneMo
 func getAvailableActions(t *Task) map[string]ViewActionModel {
 	actions := make(map[string]ViewActionModel)
 
+	if t.Title == "" {
+		actions["save"] = ViewActionModel{
+			Label:  "Create",
+			Name:   "save",
+			Action: "/new/",
+			Method: http.MethodPost,
+		}
+
+		return actions
+	}
+
 	actions["view"] = ViewActionModel{
 		Label:  "View",
 		Name:   "view",
@@ -28,7 +39,7 @@ func getAvailableActions(t *Task) map[string]ViewActionModel {
 		Action: "/view/" + t.Lane + "/" + t.Filename,
 	}
 
-	actions["update"] = ViewActionModel{
+	actions["save"] = ViewActionModel{
 		Label:  "Update",
 		Name:   "update",
 		Action: "/update/" + t.Lane + "/" + t.Filename,

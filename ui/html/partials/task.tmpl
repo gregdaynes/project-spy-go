@@ -50,11 +50,10 @@
           </select>
 
             <button-group>
-              <button type="submit">{{ .Actions.update.Label }}</button>
+              <button type="submit" formmethod="{{ .Actions.save.Method }}" formaction="{{ .Actions.save.Action }}">{{ .Actions.save.Label }}</button>
 
                 <details class="dropdown">
                   <summary></summary>
-
 
                   <div>
                     {{ if .Actions.delete }}
