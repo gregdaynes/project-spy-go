@@ -16,6 +16,7 @@ type templateData struct {
 	CurrentTask ViewTaskModel
 	ShowTask    bool
 	ShowInfo    bool
+	SearchData  string
 }
 
 type ViewLaneModel struct {

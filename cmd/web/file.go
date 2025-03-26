@@ -10,6 +10,7 @@ import (
 	"strings"
 
 	"github.com/djherbis/times"
+	"github.com/gosimple/slug"
 )
 
 func parseFile(fp string) (task Task, err error) {
@@ -79,6 +80,7 @@ func parseFile(fp string) (task Task, err error) {
 
 	task.Lane = strs[1]
 	task.Filename = strs[2]
+	task.ID = slug.Make(strs[1] + "-" + strs[2])
 
 	return task, nil
 }
