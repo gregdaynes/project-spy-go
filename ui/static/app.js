@@ -5,6 +5,10 @@ import './task-dialog.js'
 import './info-dialog.js'
 import './confirm-dialog.js'
 
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelector('.backdrop').remove()
+})
+
 document.addEventListener('keydown', (e) => {
   if (e.ctrlKey && e.key === 'n') {
     e.preventDefault()

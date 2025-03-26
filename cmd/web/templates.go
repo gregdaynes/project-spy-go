@@ -15,6 +15,7 @@ type templateData struct {
 	TaskLanes   map[int]ViewLaneModel
 	CurrentTask ViewTaskModel
 	ShowTask    bool
+	ShowInfo    bool
 }
 
 type ViewLaneModel struct {

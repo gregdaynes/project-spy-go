@@ -32,8 +32,10 @@
 		</script>
 	</head>
 	<body>
+		<div class="backdrop"></div>
+
 		<application-header>
-			{{ template "info-dialog" }}
+			{{ template "info-dialog" . }}
 			<h1>ProjectSpy</h1>
 			{{ template "filter" }}
 		</application-header>

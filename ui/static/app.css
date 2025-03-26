@@ -353,4 +353,11 @@
     flex-direction: column;
     gap: var(--s-xs);
   }
+
+  body:has(dialog[open]) .backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgb(30,30,30);
+    opacity: 0.9;
+  }
 }

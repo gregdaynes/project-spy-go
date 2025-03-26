@@ -74,7 +74,7 @@ func (app *application) view(w http.ResponseWriter, r *http.Request) {
 		lane := app.taskLanes[dir]
 
 		data.TaskLanes[i] = ViewLaneModel{
-			Name:  lane.Name,
+			Name:  lanes[i].Name,
 			Slug:  lane.Slug,
 			Tasks: make(map[string]ViewTaskModel),
 			Count: len(lane.Tasks),
