@@ -15,7 +15,6 @@ import (
 	"github.com/gosimple/slug"
 	"projectspy.dev/internal/search"
 	"projectspy.dev/internal/task"
-	"projectspy.dev/web"
 )
 
 func (app *application) archive(w http.ResponseWriter, r *http.Request) {
@@ -111,7 +110,7 @@ func (app *application) home(w http.ResponseWriter, r *http.Request) {
 	data := app.newTemplateData(r)
 	data.SearchData = search.SearchData(app.taskLanes)
 	data.TaskLanes = task.RenderTaskLanes(app.config, app.taskLanes)
-	app.render(w, r, http.StatusOK, "home.tmpl", data)
+	app.render(w, r, http.StatusOK, data)
 }
 
 func (app *application) info(w http.ResponseWriter, r *http.Request) {
@@ -119,7 +118,7 @@ func (app *application) info(w http.ResponseWriter, r *http.Request) {
 	data.SearchData = search.SearchData(app.taskLanes)
 	data.TaskLanes = task.RenderTaskLanes(app.config, app.taskLanes)
 	data.ShowInfo = true
-	app.render(w, r, http.StatusOK, "home.tmpl", data)
+	app.render(w, r, http.StatusOK, data)
 }
 
 func (app *application) manifest(w http.ResponseWriter, r *http.Request) {
@@ -177,7 +176,7 @@ func (app *application) newTask(w http.ResponseWriter, r *http.Request) {
 	data.TaskLanes = task.RenderTaskLanes(app.config, app.taskLanes)
 
 	newTask := task.Task{}
-	data.CurrentTask = web.ViewTaskModel{
+	data.CurrentTask = task.Task{
 		Title:          "",
 		Body:           "",
 		ShowDetails:    true,
@@ -188,7 +187,7 @@ func (app *application) newTask(w http.ResponseWriter, r *http.Request) {
 	}
 	data.ShowTask = true
 
-	app.render(w, r, http.StatusOK, "home.tmpl", data)
+	app.render(w, r, http.StatusOK, data)
 }
 
 func (app *application) update(w http.ResponseWriter, r *http.Request) {
@@ -260,7 +259,7 @@ func (app *application) view(w http.ResponseWriter, r *http.Request) {
 	data.SearchData = search.SearchData(app.taskLanes)
 	data.TaskLanes = task.RenderTaskLanes(app.config, app.taskLanes)
 
-	data.CurrentTask = web.ViewTaskModel{
+	data.CurrentTask = task.Task{
 		Title:          t.Title,
 		Body:           t.RawContents,
 		ShowDetails:    t.HasPriorityOrTags(),
@@ -271,7 +270,7 @@ func (app *application) view(w http.ResponseWriter, r *http.Request) {
 	}
 	data.ShowTask = true
 
-	app.render(w, r, http.StatusOK, "home.tmpl", data)
+	app.render(w, r, http.StatusOK, data)
 }
 
 func (app *application) getTask(lane, filename string) (t task.Task, ok bool) {

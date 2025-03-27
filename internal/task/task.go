@@ -3,8 +3,6 @@ package task
 import (
 	"net/http"
 	"time"
-
-	"projectspy.dev/web"
 )
 
 type Tasks map[string]Task
@@ -25,6 +23,17 @@ type Task struct {
 	ModifiedTime    time.Time
 	CreatedTime     time.Time
 	Order           int
+	Actions         map[string]Action
+	ShowDetails     bool
+	Body            string
+	AvailableLanes  map[string]TaskLane
+}
+
+type Action struct {
+	Label  string
+	Name   string
+	Method string
+	Action string
 }
 
 func (t *Task) HasPriorityOrTags() bool {
@@ -35,11 +44,11 @@ func (t *Task) HasPriorityOrTags() bool {
 	return false
 }
 
-func GetAvailableLanes(t *Task, lanes map[string]TaskLane) map[string]web.ViewLaneModel {
-	taskLanes := make(map[string]web.ViewLaneModel)
+func GetAvailableLanes(t *Task, lanes map[string]TaskLane) map[string]TaskLane {
+	taskLanes := make(map[string]TaskLane)
 
 	for name, lane := range lanes {
-		taskLanes[name] = web.ViewLaneModel{
+		taskLanes[name] = TaskLane{
 			Name:     lane.Name,
 			Slug:     lane.Slug,
 			Selected: t.Lane == lane.Name,
@@ -49,11 +58,11 @@ func GetAvailableLanes(t *Task, lanes map[string]TaskLane) map[string]web.ViewLa
 	return taskLanes
 }
 
-func GetAvailableActions(t *Task) map[string]web.ViewActionModel {
-	actions := make(map[string]web.ViewActionModel)
+func GetAvailableActions(t *Task) map[string]Action {
+	actions := make(map[string]Action)
 
 	if t.Filename == "" {
-		actions["save"] = web.ViewActionModel{
+		actions["save"] = Action{
 			Label:  "Create",
 			Name:   "save",
 			Action: "/new/",
@@ -63,27 +72,27 @@ func GetAvailableActions(t *Task) map[string]web.ViewActionModel {
 		return actions
 	}
 
-	actions["view"] = web.ViewActionModel{
+	actions["view"] = Action{
 		Label:  "View",
 		Name:   "view",
 		Method: http.MethodGet,
 		Action: "/view/" + t.Lane + "/" + t.Filename,
 	}
 
-	actions["save"] = web.ViewActionModel{
+	actions["save"] = Action{
 		Label:  "Update",
 		Name:   "update",
 		Action: "/update/" + t.Lane + "/" + t.Filename,
 		Method: http.MethodPost,
 	}
 
-	actions["archive"] = web.ViewActionModel{
+	actions["archive"] = Action{
 		Label:  "Archive",
 		Name:   "archive",
 		Action: "/archive/" + t.Lane + "/" + t.Filename,
 		Method: http.MethodGet,
 	}
-	actions["delete"] = web.ViewActionModel{
+	actions["delete"] = Action{
 		Label:  "Delete",
 		Name:   "delete",
 		Action: "/delete/" + t.Lane + "/" + t.Filename,

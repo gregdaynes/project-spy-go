@@ -10,17 +10,17 @@ import (
 	"github.com/fsnotify/fsnotify"
 	"projectspy.dev/internal/config"
 	"projectspy.dev/internal/event-bus"
-	"projectspy.dev/web"
 )
 
 type TaskLanes map[string]TaskLane
 
 type TaskLane struct {
-	Name  string
-	Slug  string
-	Path  string
-	Tasks Tasks
-	Count int
+	Name     string
+	Slug     string
+	Path     string
+	Tasks    Tasks
+	Count    int
+	Selected bool
 }
 
 func NewTaskLanes() (TaskLanes, error) {
@@ -146,31 +146,31 @@ func SetupWatcher(eventBus *event_bus.EventBus[string], lanes TaskLanes) *fsnoti
 	return watcher
 }
 
-func RenderTaskLanes(config *config.Config, lanes map[string]TaskLane) map[int]web.ViewLaneModel {
-	taskLanes := make(map[int]web.ViewLaneModel)
+func RenderTaskLanes(config *config.Config, lanes map[string]TaskLane) map[int]TaskLane {
+	taskLanes := make(map[int]TaskLane)
 	configLanes := config.Lanes
 
 	for i := 0; i < len(configLanes); i++ {
 		dir := configLanes[i].Dir
 		lane := lanes[dir]
 
-		taskLanes[i] = web.ViewLaneModel{
+		taskLanes[i] = TaskLane{
 			Name:  configLanes[i].Name,
 			Slug:  lane.Slug,
-			Tasks: make(map[string]web.ViewTaskModel),
+			Tasks: make(map[string]Task),
 			Count: len(lane.Tasks),
 		}
 
 		for _, task := range lane.Tasks {
-			actions := make(map[string]web.ViewActionModel)
-			actions["view"] = web.ViewActionModel{
+			actions := make(map[string]Action)
+			actions["view"] = Action{
 				Label:  "View",
 				Name:   "view",
 				Action: "/view/" + task.Lane + "/" + task.Filename,
 				Method: http.MethodGet,
 			}
 
-			taskLanes[i].Tasks[task.Filename] = web.ViewTaskModel{
+			taskLanes[i].Tasks[task.Filename] = Task{
 				Lane:            task.Lane,
 				Title:           task.Title,
 				DescriptionHTML: task.DescriptionHTML,

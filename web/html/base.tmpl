@@ -42,7 +42,13 @@
 
 		<application-wrapper>
 			<main>
-				{{template "main" .}}
+				{{ if .TaskLanes }}
+					{{template "lanes" .TaskLanes }}
+				{{ end }}
+
+				{{if .ShowTask}}
+					{{template "task" .CurrentTask}}
+				{{end}}
 			</main>
 		</application-wrapper>
 	</body>
