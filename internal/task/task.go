@@ -52,7 +52,7 @@ func GetAvailableLanes(t *Task, lanes map[string]TaskLane) map[string]web.ViewLa
 func GetAvailableActions(t *Task) map[string]web.ViewActionModel {
 	actions := make(map[string]web.ViewActionModel)
 
-	if t.Title == "" {
+	if t.Filename == "" {
 		actions["save"] = web.ViewActionModel{
 			Label:  "Create",
 			Name:   "save",
