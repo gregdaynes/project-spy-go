@@ -7,8 +7,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const taskHeader = task.querySelector('task-header')
     const taskBody = task.querySelector('task-body')
 
-    task.setAttribute('data-header-original', encodeURIComponent(taskHeader.innerHTML))
-    task.setAttribute('data-body-original', encodeURIComponent(taskBody.innerHTML))
+    task.setAttribute('data-header-original', encodeURIComponent(taskHeader.textContent.trim()))
+    task.setAttribute('data-body-original', encodeURIComponent(taskBody.textContent.trim()))
   }
 
   let filterData = document.getElementById('search-data')?.textContent
