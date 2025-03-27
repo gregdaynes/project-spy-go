@@ -1,11 +1,7 @@
 package main
 
 import (
-	"encoding/json"
 	"net/http"
-	"strings"
-
-	"github.com/gosimple/slug"
 )
 
 func getAvailableLanes(t *Task, lanes map[string]TaskLane) map[string]ViewLaneModel {
@@ -72,17 +68,7 @@ func (app *application) view(w http.ResponseWriter, r *http.Request) {
 
 	data := app.newTemplateData(r)
 
-	searchData := SearchData{}
-	for LaneName, Lane := range app.taskLanes {
-		for fileName, Task := range Lane.Tasks {
-			entry := SearchEntry{}
-			entry = append(entry, strings.ToLower(Task.Title+" "+Task.Description))
-			entry = append(entry, slug.Make(LaneName+"-"+fileName))
-			searchData = append(searchData, entry)
-		}
-	}
-	searchJSON, _ := json.Marshal(searchData)
-	data.SearchData = string(searchJSON)
+	data.SearchData = app.searchData()
 
 	lanes := app.config.Lanes
 	for i := 0; i < len(lanes); i++ {
