@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
+	"net/http"
 	"os"
 	"strings"
 
@@ -140,4 +141,43 @@ func setupWatcher(eventBus *EventBus[string], lanes TaskLanes) *fsnotify.Watcher
 	}
 
 	return watcher
+}
+
+func (app *application) renderTaskLanes() map[int]ViewLaneModel {
+	taskLanes := make(map[int]ViewLaneModel)
+	lanes := app.config.Lanes
+
+	for i := 0; i < len(lanes); i++ {
+		dir := lanes[i].Dir
+		lane := app.taskLanes[dir]
+
+		taskLanes[i] = ViewLaneModel{
+			Name:  lanes[i].Name,
+			Slug:  lane.Slug,
+			Tasks: make(map[string]ViewTaskModel),
+			Count: len(lane.Tasks),
+		}
+
+		for _, task := range lane.Tasks {
+			actions := make(map[string]ViewActionModel)
+			actions["view"] = ViewActionModel{
+				Label:  "View",
+				Name:   "view",
+				Action: "/view/" + task.Lane + "/" + task.Filename,
+				Method: http.MethodGet,
+			}
+
+			taskLanes[i].Tasks[task.Filename] = ViewTaskModel{
+				Lane:            task.Lane,
+				Title:           task.Title,
+				DescriptionHTML: task.DescriptionHTML,
+				Priority:        task.Priority,
+				Tags:            task.Tags,
+				Order:           task.Order,
+				Actions:         actions,
+			}
+		}
+	}
+
+	return taskLanes
 }
