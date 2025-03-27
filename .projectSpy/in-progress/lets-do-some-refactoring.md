@@ -9,4 +9,9 @@ Lets start off with reducing complexity of a few things:
 2) remove view models / objects - they add another layer frustration getting the data to render.
 3) evaluate file, task, and task lane go files.
 - things that feel funny are files and tasks being so closely related.
-- task lanes setting up watchers should likey be separated.
+- task lanes setting up watchers should likely be separated.
+4) rework handler files
+
+---
+
+2025-03-27 09:55	Updated task
