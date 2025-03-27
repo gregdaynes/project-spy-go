@@ -1,17 +1,18 @@
-package main
+package web
 
 import (
+	"embed"
 	"io/fs"
-	"net/http"
 	"path/filepath"
 	"text/template"
 	"time"
-
-	"projectspy.dev/ui"
 )
 
-type templateData struct {
-	message     string
+//go:embed "html" "static"
+var Files embed.FS
+
+type TemplateData struct {
+	Message     string
 	TaskLanes   map[int]ViewLaneModel
 	CurrentTask ViewTaskModel
 	ShowTask    bool
@@ -57,17 +58,10 @@ type ViewActionModel struct {
 
 var functions = template.FuncMap{}
 
-func (app *application) newTemplateData(r *http.Request) templateData {
-	return templateData{
-		message:   "Hello, world!",
-		TaskLanes: make(map[int]ViewLaneModel),
-	}
-}
-
-func newTemplateCache() (map[string]*template.Template, error) {
+func NewTemplateCache() (map[string]*template.Template, error) {
 	cache := map[string]*template.Template{}
 
-	pages, err := fs.Glob(ui.Files, "html/pages/*.tmpl")
+	pages, err := fs.Glob(Files, "html/pages/*.tmpl")
 	if err != nil {
 		return nil, err
 	}
@@ -81,7 +75,7 @@ func newTemplateCache() (map[string]*template.Template, error) {
 			page,
 		}
 
-		templateSet, err := template.New(name).Funcs(functions).ParseFS(ui.Files, patterns...)
+		templateSet, err := template.New(name).Funcs(functions).ParseFS(Files, patterns...)
 		if err != nil {
 			return nil, err
 		}

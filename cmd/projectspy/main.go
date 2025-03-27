@@ -2,29 +2,31 @@ package main
 
 import (
 	"crypto/tls"
-	"encoding/json"
 	"flag"
 	"log"
 	"log/slog"
 	"net"
 	"net/http"
 	"os"
-	"os/exec"
-	"runtime"
 	"text/template"
 	"time"
 
 	"github.com/fsnotify/fsnotify"
+	"projectspy.dev/internal/browser"
+	config2 "projectspy.dev/internal/config"
+	"projectspy.dev/internal/event-bus"
+	"projectspy.dev/internal/task"
+	"projectspy.dev/web"
 )
 
 type application struct {
 	debug         bool
 	logger        *slog.Logger
 	templateCache map[string]*template.Template
-	taskLanes     map[string]TaskLane
+	taskLanes     map[string]task.TaskLane
 	watcher       *fsnotify.Watcher
-	eventBus      *EventBus[string]
-	config        *Config
+	eventBus      *event_bus.EventBus[string]
+	config        *config2.Config
 }
 
 func main() {
@@ -42,29 +44,29 @@ func main() {
 
 	logger := slog.New(slog.NewJSONHandler(os.Stdout, &slogHandlerOptions))
 
-	config, err := newConfiguration()
+	config, err := config2.NewConfiguration()
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	templateCache, err := newTemplateCache()
+	templateCache, err := web.NewTemplateCache()
 	if err != nil {
 		logger.Error(err.Error())
 		os.Exit(1)
 	}
 
 	// setup task lanes
-	taskLanes, err := newTaskLanes()
+	taskLanes, err := task.NewTaskLanes()
 	if err != nil {
 		logger.Error(err.Error())
 		os.Exit(1)
 	}
 
-	eventBus := NewEventBus[string]()
+	eventBus := event_bus.NewEventBus[string]()
 
-	watcher := setupWatcher(eventBus, taskLanes)
+	watcher := task.SetupWatcher(eventBus, taskLanes)
 
-	listTasks(taskLanes)
+	task.ListTasks(taskLanes)
 
 	app := &application{
 		debug:         *debug,
@@ -97,54 +99,17 @@ func main() {
 		log.Fatal(err)
 	}
 
-	//err = open("https://localhost:8443")
-	//if err != nil {
-	//	log.Fatal(err)
-	//}
-
-	log.Fatal(srv.Serve(l))
-}
-
-func open(url string) error {
-	var cmd string
-	var args []string
-
-	switch runtime.GOOS {
-	case "windows":
-		cmd = "cmd"
-		args = []string{"/c", "start"}
-	case "darwin":
-		cmd = "open"
-	default: // "linux", "freebsd", "openbsd", "netbsd"
-		cmd = "xdg-open"
-	}
-	args = append(args, url)
-	return exec.Command(cmd, args...).Start()
-}
-
-type ConfigLane struct {
-	Dir  string `json:"dir"`
-	Name string `json:"name"`
-}
-type Config struct {
-	Lanes []ConfigLane `json:"lanes"`
-}
-
-func newConfiguration() (config Config, err error) {
-	cwd, err := os.Getwd()
+	err = browser.Open("https://localhost:8443")
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	file, err := os.ReadFile(cwd + "/.projectSpy/projectspy.json")
-	if err != nil {
-		log.Fatal(err)
-	}
+	log.Fatal(srv.ServeTLS(l, "./tls/cert.pem", "./tls/key.pem"))
+}
 
-	err = json.Unmarshal(file, &config)
-	if err != nil {
-		log.Fatal(err)
+func (app *application) newTemplateData(r *http.Request) web.TemplateData {
+	return web.TemplateData{
+		Message:   "Hello, world!",
+		TaskLanes: make(map[int]web.ViewLaneModel),
 	}
-
-	return config, nil
 }

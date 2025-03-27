@@ -3,13 +3,13 @@ package main
 import (
 	"net/http"
 
-	"projectspy.dev/ui"
+	"projectspy.dev/web"
 )
 
 func (app *application) Routes() http.Handler {
 	mux := http.NewServeMux()
 
-	mux.Handle("GET /static/", http.FileServerFS(ui.Files))
+	mux.Handle("GET /static/", http.FileServerFS(web.Files))
 	mux.Handle("GET /", http.HandlerFunc(app.home))
 	mux.Handle("GET /info", http.HandlerFunc(app.info))
 	mux.Handle("POST /new/", http.HandlerFunc(app.createTask))

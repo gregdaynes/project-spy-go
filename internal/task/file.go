@@ -1,4 +1,4 @@
-package main
+package task
 
 import (
 	"bufio"
@@ -13,7 +13,7 @@ import (
 	"github.com/gosimple/slug"
 )
 
-func parseFile(fp string) (task Task, err error) {
+func ParseFile(fp string) (task Task, err error) {
 	data, err := os.Open(fp)
 	if err != nil {
 		log.Fatal(err)

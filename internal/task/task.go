@@ -1,8 +1,10 @@
-package main
+package task
 
 import (
 	"net/http"
 	"time"
+
+	"projectspy.dev/web"
 )
 
 type Tasks map[string]Task
@@ -33,11 +35,11 @@ func (t *Task) HasPriorityOrTags() bool {
 	return false
 }
 
-func getAvailableLanes(t *Task, lanes map[string]TaskLane) map[string]ViewLaneModel {
-	taskLanes := make(map[string]ViewLaneModel)
+func GetAvailableLanes(t *Task, lanes map[string]TaskLane) map[string]web.ViewLaneModel {
+	taskLanes := make(map[string]web.ViewLaneModel)
 
 	for name, lane := range lanes {
-		taskLanes[name] = ViewLaneModel{
+		taskLanes[name] = web.ViewLaneModel{
 			Name:     lane.Name,
 			Slug:     lane.Slug,
 			Selected: t.Lane == lane.Name,
@@ -47,11 +49,11 @@ func getAvailableLanes(t *Task, lanes map[string]TaskLane) map[string]ViewLaneMo
 	return taskLanes
 }
 
-func getAvailableActions(t *Task) map[string]ViewActionModel {
-	actions := make(map[string]ViewActionModel)
+func GetAvailableActions(t *Task) map[string]web.ViewActionModel {
+	actions := make(map[string]web.ViewActionModel)
 
 	if t.Title == "" {
-		actions["save"] = ViewActionModel{
+		actions["save"] = web.ViewActionModel{
 			Label:  "Create",
 			Name:   "save",
 			Action: "/new/",
@@ -61,27 +63,27 @@ func getAvailableActions(t *Task) map[string]ViewActionModel {
 		return actions
 	}
 
-	actions["view"] = ViewActionModel{
+	actions["view"] = web.ViewActionModel{
 		Label:  "View",
 		Name:   "view",
 		Method: http.MethodGet,
 		Action: "/view/" + t.Lane + "/" + t.Filename,
 	}
 
-	actions["save"] = ViewActionModel{
+	actions["save"] = web.ViewActionModel{
 		Label:  "Update",
 		Name:   "update",
 		Action: "/update/" + t.Lane + "/" + t.Filename,
 		Method: http.MethodPost,
 	}
 
-	actions["archive"] = ViewActionModel{
+	actions["archive"] = web.ViewActionModel{
 		Label:  "Archive",
 		Name:   "archive",
 		Action: "/archive/" + t.Lane + "/" + t.Filename,
 		Method: http.MethodGet,
 	}
-	actions["delete"] = ViewActionModel{
+	actions["delete"] = web.ViewActionModel{
 		Label:  "Delete",
 		Name:   "delete",
 		Action: "/delete/" + t.Lane + "/" + t.Filename,

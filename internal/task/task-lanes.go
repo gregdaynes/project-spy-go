@@ -1,4 +1,4 @@
-package main
+package task
 
 import (
 	"fmt"
@@ -8,6 +8,9 @@ import (
 	"strings"
 
 	"github.com/fsnotify/fsnotify"
+	"projectspy.dev/internal/config"
+	"projectspy.dev/internal/event-bus"
+	"projectspy.dev/web"
 )
 
 type TaskLanes map[string]TaskLane
@@ -20,7 +23,7 @@ type TaskLane struct {
 	Count int
 }
 
-func newTaskLanes() (TaskLanes, error) {
+func NewTaskLanes() (TaskLanes, error) {
 	var taskLanes = make(TaskLanes)
 
 	files, err := os.ReadDir(".projectSpy")
@@ -50,7 +53,7 @@ func newTaskLanes() (TaskLanes, error) {
 	return taskLanes, nil
 }
 
-func listTasks(lanes TaskLanes) {
+func ListTasks(lanes TaskLanes) {
 	for k, lane := range lanes {
 		entries, err := os.ReadDir(".projectSpy/" + lane.Slug)
 		if err != nil {
@@ -60,7 +63,7 @@ func listTasks(lanes TaskLanes) {
 		tasks := make(Tasks)
 
 		for _, e := range entries {
-			task, err := parseFile(".projectSpy/" + lane.Slug + "/" + e.Name())
+			task, err := ParseFile(".projectSpy/" + lane.Slug + "/" + e.Name())
 			if err != nil {
 				log.Fatal(err)
 			}
@@ -74,7 +77,7 @@ func listTasks(lanes TaskLanes) {
 	}
 }
 
-func setupWatcher(eventBus *EventBus[string], lanes TaskLanes) *fsnotify.Watcher {
+func SetupWatcher(eventBus *event_bus.EventBus[string], lanes TaskLanes) *fsnotify.Watcher {
 	watcher, err := fsnotify.NewWatcher()
 	if err != nil {
 		log.Fatal(err)
@@ -107,7 +110,7 @@ func setupWatcher(eventBus *EventBus[string], lanes TaskLanes) *fsnotify.Watcher
 						eventBus.Publish("delete", filename)
 					}
 
-					task, err := parseFile(event.Name)
+					task, err := ParseFile(event.Name)
 					if err != nil {
 						log.Fatal(err)
 					}
@@ -143,31 +146,31 @@ func setupWatcher(eventBus *EventBus[string], lanes TaskLanes) *fsnotify.Watcher
 	return watcher
 }
 
-func (app *application) renderTaskLanes() map[int]ViewLaneModel {
-	taskLanes := make(map[int]ViewLaneModel)
-	lanes := app.config.Lanes
+func RenderTaskLanes(config *config.Config, lanes map[string]TaskLane) map[int]web.ViewLaneModel {
+	taskLanes := make(map[int]web.ViewLaneModel)
+	configLanes := config.Lanes
 
-	for i := 0; i < len(lanes); i++ {
-		dir := lanes[i].Dir
-		lane := app.taskLanes[dir]
+	for i := 0; i < len(configLanes); i++ {
+		dir := configLanes[i].Dir
+		lane := lanes[dir]
 
-		taskLanes[i] = ViewLaneModel{
-			Name:  lanes[i].Name,
+		taskLanes[i] = web.ViewLaneModel{
+			Name:  configLanes[i].Name,
 			Slug:  lane.Slug,
-			Tasks: make(map[string]ViewTaskModel),
+			Tasks: make(map[string]web.ViewTaskModel),
 			Count: len(lane.Tasks),
 		}
 
 		for _, task := range lane.Tasks {
-			actions := make(map[string]ViewActionModel)
-			actions["view"] = ViewActionModel{
+			actions := make(map[string]web.ViewActionModel)
+			actions["view"] = web.ViewActionModel{
 				Label:  "View",
 				Name:   "view",
 				Action: "/view/" + task.Lane + "/" + task.Filename,
 				Method: http.MethodGet,
 			}
 
-			taskLanes[i].Tasks[task.Filename] = ViewTaskModel{
+			taskLanes[i].Tasks[task.Filename] = web.ViewTaskModel{
 				Lane:            task.Lane,
 				Title:           task.Title,
 				DescriptionHTML: task.DescriptionHTML,
