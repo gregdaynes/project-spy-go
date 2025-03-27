@@ -13,7 +13,7 @@ import (
 
 	"github.com/fsnotify/fsnotify"
 	"projectspy.dev/internal/browser"
-	config2 "projectspy.dev/internal/config"
+	"projectspy.dev/internal/config"
 	"projectspy.dev/internal/event-bus"
 	"projectspy.dev/internal/task"
 	"projectspy.dev/web"
@@ -26,7 +26,7 @@ type application struct {
 	taskLanes     map[string]task.TaskLane
 	watcher       *fsnotify.Watcher
 	eventBus      *event_bus.EventBus[string]
-	config        *config2.Config
+	config        *config.Config
 }
 
 func main() {
@@ -44,7 +44,7 @@ func main() {
 
 	logger := slog.New(slog.NewJSONHandler(os.Stdout, &slogHandlerOptions))
 
-	config, err := config2.NewConfiguration()
+	cfg, err := config.NewConfiguration()
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -75,7 +75,7 @@ func main() {
 		taskLanes:     taskLanes,
 		watcher:       watcher,
 		eventBus:      eventBus,
-		config:        &config,
+		config:        &cfg,
 	}
 
 	tlsConfig := &tls.Config{
