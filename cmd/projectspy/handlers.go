@@ -110,6 +110,13 @@ func (app *application) home(w http.ResponseWriter, r *http.Request) {
 	data := app.newTemplateData(r)
 	data.SearchData = search.SearchData(app.taskLanes)
 	data.TaskLanes = task.RenderTaskLanes(app.config, app.taskLanes)
+
+	for _, lane := range data.TaskLanes {
+		for _, t := range lane.Tasks {
+			fmt.Println(t.ID)
+		}
+	}
+
 	app.render(w, r, http.StatusOK, data)
 }
 
@@ -183,7 +190,7 @@ func (app *application) newTask(w http.ResponseWriter, r *http.Request) {
 		Priority:       0,
 		Tags:           []string{},
 		AvailableLanes: task.GetAvailableLanes(&newTask, app.taskLanes),
-		Actions:        task.GetAvailableActions(&newTask),
+		Actions:        task.GetAvailableActions(&newTask, "create"),
 	}
 	data.ShowTask = true
 
@@ -266,7 +273,7 @@ func (app *application) view(w http.ResponseWriter, r *http.Request) {
 		Priority:       t.Priority,
 		Tags:           t.Tags,
 		AvailableLanes: task.GetAvailableLanes(&t, app.taskLanes),
-		Actions:        task.GetAvailableActions(&t),
+		Actions:        task.GetAvailableActions(&t, "edit"),
 	}
 	data.ShowTask = true
 

@@ -1,9 +1,7 @@
 package task
 
 import (
-	"fmt"
 	"log"
-	"net/http"
 	"os"
 	"strings"
 
@@ -97,7 +95,6 @@ func SetupWatcher(eventBus *event_bus.EventBus[string], lanes TaskLanes) *fsnoti
 				filename := strings.Split(name, "/")[1]
 
 				if event.Has(fsnotify.Create) || event.Has(fsnotify.Write) {
-					fmt.Println("create or write", event.Name)
 					lane, ok := lanes[laneName]
 					if !ok {
 						log.Fatal("lane not found", laneName)
@@ -105,7 +102,6 @@ func SetupWatcher(eventBus *event_bus.EventBus[string], lanes TaskLanes) *fsnoti
 
 					_, ok = lane.Tasks[filename]
 					if ok {
-						fmt.Println("deleting", laneName, filename)
 						delete(lane.Tasks, filename)
 						eventBus.Publish("delete", filename)
 					}
@@ -120,7 +116,6 @@ func SetupWatcher(eventBus *event_bus.EventBus[string], lanes TaskLanes) *fsnoti
 				}
 
 				if event.Has(fsnotify.Rename) || event.Has(fsnotify.Remove) {
-					fmt.Println("rename or remove", filename)
 					delete(lanes[laneName].Tasks, filename)
 					eventBus.Publish("remove", laneName+"/"+filename)
 				}
@@ -154,31 +149,11 @@ func RenderTaskLanes(config *config.Config, lanes map[string]TaskLane) map[int]T
 		dir := configLanes[i].Dir
 		lane := lanes[dir]
 
-		taskLanes[i] = TaskLane{
-			Name:  configLanes[i].Name,
-			Slug:  lane.Slug,
-			Tasks: make(map[string]Task),
-			Count: len(lane.Tasks),
-		}
+		taskLanes[i] = lane
 
 		for _, task := range lane.Tasks {
-			actions := make(map[string]Action)
-			actions["view"] = Action{
-				Label:  "View",
-				Name:   "view",
-				Action: "/view/" + task.Lane + "/" + task.Filename,
-				Method: http.MethodGet,
-			}
-
-			taskLanes[i].Tasks[task.Filename] = Task{
-				Lane:            task.Lane,
-				Title:           task.Title,
-				DescriptionHTML: task.DescriptionHTML,
-				Priority:        task.Priority,
-				Tags:            task.Tags,
-				Order:           task.Order,
-				Actions:         actions,
-			}
+			task.Actions = GetAvailableActions(&task, "view")
+			taskLanes[i].Tasks[task.Filename] = task
 		}
 	}
 

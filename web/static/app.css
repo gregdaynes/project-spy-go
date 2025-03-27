@@ -352,6 +352,7 @@
     display: flex;
     flex-direction: column;
     gap: var(--s-xs);
+    width: calc(100% - 1px);
   }
 
   body:has(dialog[open]) .backdrop {

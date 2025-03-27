@@ -58,45 +58,43 @@ func GetAvailableLanes(t *Task, lanes map[string]TaskLane) map[string]TaskLane {
 	return taskLanes
 }
 
-func GetAvailableActions(t *Task) map[string]Action {
+func GetAvailableActions(t *Task, mode string) map[string]Action {
 	actions := make(map[string]Action)
 
-	if t.Filename == "" {
+	switch mode {
+	case "create":
 		actions["save"] = Action{
 			Label:  "Create",
 			Name:   "save",
 			Action: "/new/",
 			Method: http.MethodPost,
 		}
-
-		return actions
-	}
-
-	actions["view"] = Action{
-		Label:  "View",
-		Name:   "view",
-		Method: http.MethodGet,
-		Action: "/view/" + t.Lane + "/" + t.Filename,
-	}
-
-	actions["save"] = Action{
-		Label:  "Update",
-		Name:   "update",
-		Action: "/update/" + t.Lane + "/" + t.Filename,
-		Method: http.MethodPost,
-	}
-
-	actions["archive"] = Action{
-		Label:  "Archive",
-		Name:   "archive",
-		Action: "/archive/" + t.Lane + "/" + t.Filename,
-		Method: http.MethodGet,
-	}
-	actions["delete"] = Action{
-		Label:  "Delete",
-		Name:   "delete",
-		Action: "/delete/" + t.Lane + "/" + t.Filename,
-		Method: http.MethodGet,
+	case "view":
+		actions["view"] = Action{
+			Label:  "View",
+			Name:   "view",
+			Method: http.MethodGet,
+			Action: "/view/" + t.Lane + "/" + t.Filename,
+		}
+	case "edit":
+		actions["save"] = Action{
+			Label:  "Update",
+			Name:   "update",
+			Action: "/update/" + t.Lane + "/" + t.Filename,
+			Method: http.MethodPost,
+		}
+		actions["archive"] = Action{
+			Label:  "Archive",
+			Name:   "archive",
+			Action: "/archive/" + t.Lane + "/" + t.Filename,
+			Method: http.MethodGet,
+		}
+		actions["delete"] = Action{
+			Label:  "Delete",
+			Name:   "delete",
+			Action: "/delete/" + t.Lane + "/" + t.Filename,
+			Method: http.MethodGet,
+		}
 	}
 
 	return actions

@@ -65,13 +65,11 @@ func ParseFile(fp string) (task Task, err error) {
 	task.ModifiedTime = t.ModTime()
 
 	if t.HasBirthTime() {
-		log.Println(t.BirthTime())
 		task.CreatedTime = t.BirthTime()
 	}
 
 	relative, ok := strings.CutPrefix(fp, ".projectSpy")
 	if ok != true {
-		fmt.Println(relative, fp)
 		log.Fatal("bad time trimming prefix")
 	}
 	task.RelativePath = relative
@@ -81,6 +79,8 @@ func ParseFile(fp string) (task Task, err error) {
 	task.Lane = strs[1]
 	task.Filename = strs[2]
 	task.ID = slug.Make(strs[1] + "-" + strs[2])
+
+	fmt.Println("xxxxxxxxxxxxxxxxxxxxxxxxxxx", task.ID)
 
 	return task, nil
 }

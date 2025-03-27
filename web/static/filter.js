@@ -15,6 +15,8 @@ document.addEventListener('DOMContentLoaded', () => {
   if (!filterData) return
   filterData = JSON.parse(filterData)
 
+  console.log(filterData)
+
   const content = template.content.cloneNode(true)
   const button = content.querySelector('button')
   const field = content.querySelector('input')
@@ -82,7 +84,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const taskBody = task.querySelector('task-body')
 
     const regex = new RegExp(str + '(?![^<]*>)', 'ig')
-    taskHeader.innerHTML = decodeURIComponent(task.getAttribute('data-header-original')).replace(regex, '<mark>$&</mark>')
+    taskHeader.querySelector('h3').innerHTML = decodeURIComponent(task.getAttribute('data-header-original')).replace(regex, '<mark>$&</mark>')
     taskBody.innerHTML = decodeURIComponent(task.getAttribute('data-body-original')).replace(regex, '<mark>$&</mark>')
   }
 
