@@ -116,7 +116,39 @@ func (app *application) createTask(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *application) delete(w http.ResponseWriter, r *http.Request) {
+	qLane := r.PathValue("lane")
+	qFile := r.PathValue("filename")
 
+	t, ok := app.getTask(qLane, qFile)
+	if !ok {
+		http.Redirect(w, r, "/", http.StatusSeeOther)
+		return
+	}
+
+	data := app.newTemplateData(r)
+	data.SearchData = search.SearchData(app.taskLanes)
+	data.TaskLanes = task.RenderTaskLanes(app.config, app.taskLanes)
+	data.ShowConfirm = true
+	data.Confirm = web.Confirm{
+		Title: "Delete",
+		Body:  "Are you sure you want to delete task <samp>" + t.Title + "</samp>?",
+	}
+	data.Confirm.Actions = make(map[string]task.Action, 0)
+	data.Confirm.Actions["Confirm"] = task.Action{
+		Label:  "Delete",
+		Name:   "delete",
+		Method: "POST",
+		Action: "/delete/" + r.PathValue("lane") + "/" + r.PathValue("filename"),
+	}
+
+	data.Confirm.Actions["Close"] = task.Action{
+		Label:  "Close",
+		Name:   "close",
+		Method: "GET",
+		Action: "/view/" + t.RelativePath,
+	}
+
+	app.render(w, r, http.StatusOK, data)
 }
 
 func (app *application) deleteConfirm(w http.ResponseWriter, r *http.Request) {

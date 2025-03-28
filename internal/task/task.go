@@ -74,25 +74,25 @@ func GetAvailableActions(t *Task, mode string) map[string]Action {
 			Label:  "View",
 			Name:   "view",
 			Method: http.MethodGet,
-			Action: "/view/" + t.Lane + "/" + t.Filename,
+			Action: "/view/" + t.RelativePath,
 		}
 	case "edit":
 		actions["save"] = Action{
 			Label:  "Update",
 			Name:   "update",
-			Action: "/update/" + t.Lane + "/" + t.Filename,
+			Action: "/update/" + t.RelativePath,
 			Method: http.MethodPost,
 		}
 		actions["archive"] = Action{
 			Label:  "Archive",
 			Name:   "archive",
-			Action: "/archive/" + t.Lane + "/" + t.Filename,
+			Action: "/archive/" + t.RelativePath,
 			Method: http.MethodGet,
 		}
 		actions["delete"] = Action{
 			Label:  "Delete",
 			Name:   "delete",
-			Action: "/delete/" + t.Lane + "/" + t.Filename,
+			Action: "/delete/" + t.RelativePath,
 			Method: http.MethodGet,
 		}
 	}
