@@ -45,12 +45,16 @@
 				{{ if .TaskLanes }}
 					{{template "lanes" .TaskLanes }}
 				{{ end }}
-
-				{{if .ShowTask}}
-					{{template "task" .CurrentTask}}
-				{{end}}
 			</main>
 		</application-wrapper>
+
+		{{if .ShowTask}}
+			{{template "task" .CurrentTask}}
+		{{end}}
+
+		{{if .ShowConfirm}}
+			{{template "confirm-dialog" .Confirm}}
+		{{end}}
 	</body>
 </html>
 {{end}}

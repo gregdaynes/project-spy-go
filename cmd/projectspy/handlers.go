@@ -15,6 +15,7 @@ import (
 	"github.com/gosimple/slug"
 	"projectspy.dev/internal/search"
 	"projectspy.dev/internal/task"
+	"projectspy.dev/web"
 )
 
 func (app *application) archive(w http.ResponseWriter, r *http.Request) {
@@ -27,12 +28,49 @@ func (app *application) archive(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	data := app.newTemplateData(r)
+	data.SearchData = search.SearchData(app.taskLanes)
+	data.TaskLanes = task.RenderTaskLanes(app.config, app.taskLanes)
+	data.ShowConfirm = true
+	data.Confirm = web.Confirm{
+		Title: "Archive",
+		Body:  "Are you sure you want to archive task <samp>" + t.Title + "</samp>?",
+	}
+	data.Confirm.Actions = make(map[string]task.Action, 0)
+	data.Confirm.Actions["Confirm"] = task.Action{
+		Label:  "Archive",
+		Name:   "archive",
+		Method: "POST",
+		Action: "/archive/" + r.PathValue("lane") + "/" + r.PathValue("filename"),
+	}
+
+	data.Confirm.Actions["Close"] = task.Action{
+		Label:  "Close",
+		Name:   "close",
+		Method: "GET",
+		Action: "/view/" + t.RelativePath,
+	}
+
+	app.render(w, r, http.StatusOK, data)
+}
+
+func (app *application) archiveConfirm(w http.ResponseWriter, r *http.Request) {
+	qLane := r.PathValue("lane")
+	qFile := r.PathValue("filename")
+
+	t, ok := app.getTask(qLane, qFile)
+	if !ok {
+		http.Redirect(w, r, "/", http.StatusSeeOther)
+		return
+	}
+
+	fmt.Println("will wait for", t.RelativePath)
 	ch := make(chan int)
 	waitForWrite := wait(ch, t.RelativePath)
 
 	go func() {
 		app.eventBus.Subscribe("remove", &waitForWrite)
-		err := os.Rename(filepath(t.Lane, t.Filename), filepath("_archive", qFile))
+		err := os.Rename(filepath(t.Lane, t.Filename), filepath("_archive", t.Filename))
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -78,6 +116,10 @@ func (app *application) createTask(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *application) delete(w http.ResponseWriter, r *http.Request) {
+
+}
+
+func (app *application) deleteConfirm(w http.ResponseWriter, r *http.Request) {
 	lane := r.PathValue("lane")
 	filename := r.PathValue("filename")
 
@@ -110,12 +152,6 @@ func (app *application) home(w http.ResponseWriter, r *http.Request) {
 	data := app.newTemplateData(r)
 	data.SearchData = search.SearchData(app.taskLanes)
 	data.TaskLanes = task.RenderTaskLanes(app.config, app.taskLanes)
-
-	for _, lane := range data.TaskLanes {
-		for _, t := range lane.Tasks {
-			fmt.Println(t.ID)
-		}
-	}
 
 	app.render(w, r, http.StatusOK, data)
 }
@@ -304,7 +340,6 @@ func wait(ch chan int, path string) func(string) {
 }
 
 func same(a, b string) bool {
-	fmt.Println(hash(scrub(a)), hash(scrub(b)))
 	return hash(scrub(a)) == hash(scrub(b))
 }
 

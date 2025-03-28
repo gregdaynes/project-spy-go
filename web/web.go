@@ -17,6 +17,14 @@ type TemplateData struct {
 	ShowTask    bool
 	ShowInfo    bool
 	SearchData  string
+	ShowConfirm bool
+	Confirm     Confirm
+}
+
+type Confirm struct {
+	Title   string
+	Body    string
+	Actions map[string]task.Action
 }
 
 var functions = template.FuncMap{}

@@ -1,0 +1,26 @@
+{{define "confirm-dialog"}}
+<confirm-dialog>
+    <dialog open>
+        <dialog-wrapper>
+            <header>
+                <h3>Confirm {{ .Title }}</h3>
+
+                <form method="{{ .Actions.Close.Method }}" action="{{ .Actions.Close.Action }}">
+                    <button type="submit" class="icon close"><svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" aria-label="Close confirm" viewBox="0 0 384 512"><path d="M342.6 150.6a32 32 0 0 0-45.3-45.3L192 210.7 86.6 105.4a32 32 0 0 0-45.3 45.3L146.7 256 41.4 361.4a32 32 0 0 0 45.3 45.3L192 301.3l105.4 105.3a32 32 0 0 0 45.3-45.3L237.3 256l105.3-105.4z"/></svg></button>
+                </form>
+            </header>
+
+            <dialog-main>
+                <p>{{ .Body }}</p>
+            </dialog-main>
+
+            <footer>
+                <form id="updateForm">
+                    <button formmethod="{{ .Actions.Close.Method }}" formaction="{{ .Actions.Close.Action }}">{{ .Actions.Close.Label }}</button>
+                    <button formmethod="{{ .Actions.Confirm.Method }}" formaction="{{ .Actions.Confirm.Action }}">{{ .Actions.Confirm.Label }}</button>
+                </form>
+            </footer>
+        </dialog-wrapper>
+    </dialog>
+</confirm-dialog>
+{{end}}

@@ -117,7 +117,7 @@ func SetupWatcher(eventBus *event_bus.EventBus[string], lanes TaskLanes) *fsnoti
 
 				if event.Has(fsnotify.Rename) || event.Has(fsnotify.Remove) {
 					delete(lanes[laneName].Tasks, filename)
-					eventBus.Publish("remove", laneName+"/"+filename)
+					eventBus.Publish("remove", name)
 				}
 			case err, ok := <-watcher.Errors:
 				if !ok {

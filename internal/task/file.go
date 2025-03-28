@@ -68,7 +68,7 @@ func ParseFile(fp string) (task Task, err error) {
 		task.CreatedTime = t.BirthTime()
 	}
 
-	relative, ok := strings.CutPrefix(fp, ".projectSpy")
+	relative, ok := strings.CutPrefix(fp, ".projectSpy/")
 	if ok != true {
 		log.Fatal("bad time trimming prefix")
 	}
@@ -76,11 +76,9 @@ func ParseFile(fp string) (task Task, err error) {
 
 	strs := strings.Split(relative, "/")
 
-	task.Lane = strs[1]
-	task.Filename = strs[2]
-	task.ID = slug.Make(strs[1] + "-" + strs[2])
-
-	fmt.Println("xxxxxxxxxxxxxxxxxxxxxxxxxxx", task.ID)
+	task.Lane = strs[0]
+	task.Filename = strs[1]
+	task.ID = slug.Make(strs[0] + "-" + strs[1])
 
 	return task, nil
 }
