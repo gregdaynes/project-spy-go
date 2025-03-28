@@ -149,12 +149,14 @@ func RenderTaskLanes(config *config.Config, lanes map[string]TaskLane) map[int]T
 		dir := configLanes[i].Dir
 		lane := lanes[dir]
 
-		taskLanes[i] = lane
-
 		for _, task := range lane.Tasks {
 			task.Actions = GetAvailableActions(&task, "view")
-			taskLanes[i].Tasks[task.Filename] = task
+			lane.Tasks[task.Filename] = task
 		}
+
+		lane.Count = len(lane.Tasks)
+		taskLanes[i] = lane
+
 	}
 
 	return taskLanes

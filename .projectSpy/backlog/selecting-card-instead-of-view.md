@@ -1,0 +1,8 @@
+selecting card instead of view
+===
+
+when using tab navigation, maybe we should tab to the card instead of the view link, and then expose hotkeys like enter to open, and backspace to delete? Javascript only of course, so we could even hide the view link.
+
+---
+
+2025-03-28 08:11	Created task
