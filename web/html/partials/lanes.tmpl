@@ -3,15 +3,14 @@
     {{range .}}
     <task-lane>
         <task-lane-header>
-            <h2>{{ .Name  }} ({{ .Count  }})</h2>
+            <h2>{{ .Name  }}{{ if .Count}} ({{ .Count  }}){{end}}</h2>
 
             {{ template "new-task" .Slug}}
 
             <hr>
         </task-lane-header>
 
-        <task-lane-body>
-            {{ range .Tasks }}
+        <task-lane-body>{{ range .Tasks }}
             <task-l id="{{ .ID }}">
                 <task-header>
                     <h3>{{ .Title }}</h3>
@@ -31,8 +30,7 @@
                     {{ end }}
                 </task-footer>
             </task-l>
-            {{end}}
-        </task-lane-body>
+        {{end}}</task-lane-body>
     </task-lane>
     {{end}}
 </lane-reel>
