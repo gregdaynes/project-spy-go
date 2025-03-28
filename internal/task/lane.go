@@ -146,7 +146,9 @@ func RenderTaskLanes(config *config.Config, lanes map[string]TaskLane) map[int]T
 	configLanes := config.Lanes
 
 	for i := 0; i < len(configLanes); i++ {
-		dir := configLanes[i].Dir
+		configLane := configLanes[i]
+		dir := configLane.Dir
+		name := configLane.Name
 		lane := lanes[dir]
 
 		for _, task := range lane.Tasks {
@@ -154,6 +156,7 @@ func RenderTaskLanes(config *config.Config, lanes map[string]TaskLane) map[int]T
 			lane.Tasks[task.Filename] = task
 		}
 
+		lane.Name = name
 		lane.Count = len(lane.Tasks)
 		taskLanes[i] = lane
 
