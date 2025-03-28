@@ -15,7 +15,7 @@ class InfoDialog extends HTMLElement {
     this.replaceWithButton(this.interactor)
 
     this.eventHotkey = document.addEventListener('keydown', e => {
-      if (!(e.ctrlKey && e.key === '?')) return
+      if (!(e.ctrlKey && (e.key === '?' || e.key === '/'))) return
 
       this.dialog.showModal()
     })
