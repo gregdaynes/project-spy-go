@@ -98,7 +98,7 @@ class TaskDialog extends HTMLElement {
       event.preventDefault()
 
       const form = this.textarea.getAttribute('form')
-      this.querySelector(`#${form}`).submit()
+      this.querySelector(`#${form} button`).click()
     }
   }
 }

@@ -52,6 +52,7 @@
             <button-group>
               <button type="submit" formmethod="{{ .Actions.save.Method }}" formaction="{{ .Actions.save.Action }}">{{ .Actions.save.Label }}</button>
 
+                {{ if or .Actions.delete .Actions.archive }}
                 <details class="dropdown">
                   <summary></summary>
 
@@ -64,6 +65,7 @@
                     {{ end }}
                   </div>
                 </details>
+                {{ end }}
             </button-group>
           </form>
       </footer>

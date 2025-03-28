@@ -83,6 +83,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const taskHeader = task.querySelector('task-header')
     const taskBody = task.querySelector('task-body')
 
+    if (str === '') {
+      taskHeader.querySelector('h3').innerHTML = decodeURIComponent(task.getAttribute('data-header-original'))
+      taskBody.innerHTML = decodeURIComponent(task.getAttribute('data-body-original'))
+      return
+    }
+
     const regex = new RegExp(str + '(?![^<]*>)', 'ig')
     taskHeader.querySelector('h3').innerHTML = decodeURIComponent(task.getAttribute('data-header-original')).replace(regex, '<mark>$&</mark>')
     taskBody.innerHTML = decodeURIComponent(task.getAttribute('data-body-original')).replace(regex, '<mark>$&</mark>')
