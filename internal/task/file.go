@@ -2,6 +2,7 @@ package task
 
 import (
 	"bufio"
+	"bytes"
 	"fmt"
 	"log"
 	"os"
@@ -11,6 +12,10 @@ import (
 
 	"github.com/djherbis/times"
 	"github.com/gosimple/slug"
+	"github.com/yuin/goldmark"
+	"github.com/yuin/goldmark/extension"
+	"github.com/yuin/goldmark/parser"
+	"github.com/yuin/goldmark/renderer/html"
 )
 
 func ParseFile(fp string) (task Task, err error) {
@@ -80,6 +85,10 @@ func ParseFile(fp string) (task Task, err error) {
 	task.Filename = strs[1]
 	task.ID = slug.Make(strs[0] + "-" + strs[1])
 
+	description, html := ParseDescription(task.Description)
+	task.Description = description
+	task.DescriptionHTML = html
+
 	return task, nil
 }
 
@@ -127,4 +136,32 @@ func ParseTitle(title string) (parsedTitle string) {
 	title = r.ReplaceAllString(title, "")
 
 	return title
+}
+
+func ParseDescription(text string) (output, outputHTML string) {
+	reChangelog := regexp.MustCompile(`(?:\n---\n\n)(?:(?:\d{4}-\d{2}-\d{2} \d{2}:\d{2}\t.*)\n?)+`)
+	reHeader := regexp.MustCompile(`.+\n===+\n|.+\n---+\n|#+\s.+\n`)
+	output = reChangelog.ReplaceAllString(text, "")
+	output = reHeader.ReplaceAllString(output, "")
+	output = strings.TrimSpace(output)
+	output = strings.Split(output, "\n")[0]
+
+	fmt.Println(output)
+
+	md := goldmark.New(
+		goldmark.WithExtensions(extension.GFM),
+		goldmark.WithParserOptions(
+			parser.WithAutoHeadingID(),
+		),
+		goldmark.WithRendererOptions(
+			html.WithHardWraps(),
+			html.WithXHTML(),
+		),
+	)
+	var buf bytes.Buffer
+	if err := md.Convert([]byte(output), &buf); err != nil {
+		panic(err)
+	}
+
+	return output, buf.String()
 }

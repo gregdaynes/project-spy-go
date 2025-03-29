@@ -4,6 +4,7 @@ Task Lanes
 [x] - On application start, read the available task lanes
 [x] - Setup directory watcher on lane directories
 [x] - Update task lanes on file change? (this may be a later thing)
+
 ---
 
 2025-02-19 19:18	Created task
