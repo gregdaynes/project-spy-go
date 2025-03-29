@@ -85,7 +85,7 @@ func ParseFile(fp string) (task Task, err error) {
 	task.Filename = strs[1]
 	task.ID = slug.Make(strs[0] + "-" + strs[1])
 
-	description, html := ParseDescription(task.Description)
+	description, html := ParseDescription(task.RawContents)
 	task.Description = description
 	task.DescriptionHTML = html
 
@@ -141,12 +141,11 @@ func ParseTitle(title string) (parsedTitle string) {
 func ParseDescription(text string) (output, outputHTML string) {
 	reChangelog := regexp.MustCompile(`(?:\n---\n\n)(?:(?:\d{4}-\d{2}-\d{2} \d{2}:\d{2}\t.*)\n?)+`)
 	reHeader := regexp.MustCompile(`.+\n===+\n|.+\n---+\n|#+\s.+\n`)
-	output = reChangelog.ReplaceAllString(text, "")
+	output = text
+	output = reChangelog.ReplaceAllString(output, "")
 	output = reHeader.ReplaceAllString(output, "")
 	output = strings.TrimSpace(output)
 	output = strings.Split(output, "\n")[0]
-
-	fmt.Println(output)
 
 	md := goldmark.New(
 		goldmark.WithExtensions(extension.GFM),
