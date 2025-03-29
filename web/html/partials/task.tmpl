@@ -2,14 +2,12 @@
 <task-dialog>
   <dialog open>
     <dialog-wrapper>
-      <header>
+	  <header {{ if .Title }}class="with-title"{{ end }}>
         {{ if .Title }}
-          <h3>{{ .Title }}</h3>
+			<h3>{{ .Title }}</h3>
         {{ else }}
-          <fieldset>
-            <label for="name">New task name</label>
-            <input type="text" name="name" id="name" form="updateForm" placeholder="My task to be done">
-          </fieldset>
+			<label for="name">New task name</label>
+			<input type="text" name="name" id="name" form="updateForm" placeholder="My task to be done">
         {{ end }}
 
         <form id="task-dialog-close" method="get" action="/">
@@ -72,5 +70,4 @@
     </dialog-wrapper>
   </dialog>
 </task-dialog>
-
 {{end}}

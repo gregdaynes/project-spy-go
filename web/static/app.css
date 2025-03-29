@@ -121,21 +121,30 @@
       }
 
       header {
-        display: flex;
-        gap: var(--s-m);
+		grid-template-areas: "label close" "input input";
+		grid-template-columns: 1fr max-content;
+		display: grid;
+        gap: var(--s-xs);
 
-        fieldset {
-          border: none;
-          flex: 1;
-        }
+		&.with-title {
+			grid-template-areas: "label close";
+		}
+
+		label {
+			grid-area: label;
+		}
 
         h3 {
-          flex: 1;
+			grid-area: label;
         }
 
         input {
-          margin-block-start: var(--s-xs);
+			grid-area: input;
         }
+
+		form {
+			grid-area: close;
+		}
       }
 
       dialog-main {
