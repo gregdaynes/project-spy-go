@@ -246,11 +246,15 @@ func (app *application) manifest(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *application) newTask(w http.ResponseWriter, r *http.Request) {
+	qLane := r.URL.Query()["lane"][0]
+
 	data := app.newTemplateData(r)
 	data.SearchData = search.SearchData(app.taskLanes)
 	data.TaskLanes = task.RenderTaskLanes(app.config, app.taskLanes)
 
-	newTask := task.Task{}
+	newTask := task.Task{
+		Lane: qLane,
+	}
 	data.CurrentTask = task.Task{
 		Title:          "",
 		Body:           "",
