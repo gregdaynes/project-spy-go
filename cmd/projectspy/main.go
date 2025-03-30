@@ -14,7 +14,7 @@ import (
 	"github.com/fsnotify/fsnotify"
 	"projectspy.dev/internal/browser"
 	"projectspy.dev/internal/config"
-	"projectspy.dev/internal/event-bus"
+	event_bus "projectspy.dev/internal/event-bus"
 	"projectspy.dev/internal/task"
 	"projectspy.dev/web"
 )
@@ -56,7 +56,7 @@ func main() {
 	}
 
 	// setup task lanes
-	taskLanes, err := task.NewTaskLanes()
+	taskLanes, err := task.NewTaskLanes(&cfg)
 	if err != nil {
 		logger.Error(err.Error())
 		os.Exit(1)

@@ -7,7 +7,7 @@ import (
 
 	"github.com/fsnotify/fsnotify"
 	"projectspy.dev/internal/config"
-	"projectspy.dev/internal/event-bus"
+	event_bus "projectspy.dev/internal/event-bus"
 )
 
 type TaskLanes map[string]TaskLane
@@ -21,7 +21,7 @@ type TaskLane struct {
 	Selected bool
 }
 
-func NewTaskLanes() (TaskLanes, error) {
+func NewTaskLanes(config *config.Config) (TaskLanes, error) {
 	var taskLanes = make(TaskLanes)
 
 	files, err := os.ReadDir(".projectSpy")
@@ -31,19 +31,14 @@ func NewTaskLanes() (TaskLanes, error) {
 	}
 
 	for _, file := range files {
-		if file.Name() == "_archive" {
-			continue
-		}
+		for i, lane := range config.Lanes {
+			if file.Name() == lane.Dir {
+				taskLanes[file.Name()] = TaskLane{
+					Slug: file.Name(),
+					Name: file.Name(),
+				}
 
-		if file.Name() == "projectspy.json" {
-			continue
-		}
-
-		isDir := file.IsDir()
-		if isDir == true {
-			taskLanes[file.Name()] = TaskLane{
-				Slug: file.Name(),
-				Name: file.Name(),
+				config.Lanes[i].HasDir = true
 			}
 		}
 	}
@@ -147,6 +142,11 @@ func RenderTaskLanes(config *config.Config, lanes map[string]TaskLane) map[int]T
 
 	for i := 0; i < len(configLanes); i++ {
 		configLane := configLanes[i]
+
+		if configLane.HasDir == false {
+			continue
+		}
+
 		dir := configLane.Dir
 		name := configLane.Name
 		lane := lanes[dir]

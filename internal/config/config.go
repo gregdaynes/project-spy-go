@@ -7,8 +7,9 @@ import (
 )
 
 type ConfigLane struct {
-	Dir  string `json:"dir"`
-	Name string `json:"name"`
+	Dir    string `json:"dir"`
+	Name   string `json:"name"`
+	HasDir bool
 }
 type Config struct {
 	Lanes []ConfigLane `json:"lanes"`
@@ -22,7 +23,31 @@ func NewConfiguration() (config Config, err error) {
 
 	file, err := os.ReadFile(cwd + "/.projectSpy/projectspy.json")
 	if err != nil {
-		log.Fatal(err)
+		config = Config{
+			Lanes: []ConfigLane{
+				{
+					Dir:  "inbox",
+					Name: "Inbox",
+				},
+				{
+					Dir:  "backlog",
+					Name: "Backlog",
+				},
+				{
+					Dir:  "blocked",
+					Name: "Blocked",
+				},
+				{
+					Dir:  "in-progress",
+					Name: "In Progress",
+				},
+				{
+					Dir:  "done",
+					Name: "Done",
+				},
+			},
+		}
+		return config, nil
 	}
 
 	err = json.Unmarshal(file, &config)
