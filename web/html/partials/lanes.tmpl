@@ -25,9 +25,13 @@
                 </task-body>
 
                 <task-footer>
+					<div class="actions">
                     {{range .Actions}}
                     <a href="{{ .Action }}">{{ .Label }}</a>
                     {{ end }}
+					</div>
+
+					<div class="priority">{{ range .Priority }}!{{ end }}</div>
                 </task-footer>
             </task-l>
         {{end}}</task-lane-body>

@@ -110,6 +110,6 @@ func main() {
 func (app *application) newTemplateData(r *http.Request) web.TemplateData {
 	return web.TemplateData{
 		Message:   "Hello, world!",
-		TaskLanes: make(map[int]task.TaskLane),
+		TaskLanes: make(map[int]task.TaskLaneDisplay),
 	}
 }

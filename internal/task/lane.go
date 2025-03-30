@@ -3,6 +3,7 @@ package task
 import (
 	"log"
 	"os"
+	"sort"
 	"strings"
 
 	"github.com/fsnotify/fsnotify"
@@ -17,6 +18,15 @@ type TaskLane struct {
 	Slug     string
 	Path     string
 	Tasks    Tasks
+	Count    int
+	Selected bool
+}
+
+type TaskLaneDisplay struct {
+	Name     string
+	Slug     string
+	Path     string
+	Tasks    []Task
 	Count    int
 	Selected bool
 }
@@ -136,8 +146,8 @@ func SetupWatcher(eventBus *event_bus.EventBus[string], lanes TaskLanes) *fsnoti
 	return watcher
 }
 
-func RenderTaskLanes(config *config.Config, lanes map[string]TaskLane) map[int]TaskLane {
-	taskLanes := make(map[int]TaskLane)
+func RenderTaskLanes(config *config.Config, lanes map[string]TaskLane) map[int]TaskLaneDisplay {
+	taskLanes := make(map[int]TaskLaneDisplay)
 	configLanes := config.Lanes
 
 	for i := 0; i < len(configLanes); i++ {
@@ -151,14 +161,30 @@ func RenderTaskLanes(config *config.Config, lanes map[string]TaskLane) map[int]T
 		name := configLane.Name
 		lane := lanes[dir]
 
-		for _, task := range lane.Tasks {
-			task.Actions = GetAvailableActions(&task, "view")
-			lane.Tasks[task.Filename] = task
+		newLane := TaskLaneDisplay{
+			Name:     name,
+			Slug:     dir,
+			Path:     "test",
+			Tasks:    make([]Task, 0),
+			Selected: false,
 		}
 
-		lane.Name = name
-		lane.Count = len(lane.Tasks)
-		taskLanes[i] = lane
+		for _, task := range lane.Tasks {
+			task.Actions = GetAvailableActions(&task, "view")
+			newLane.Tasks = append(newLane.Tasks, task)
+		}
+
+		sort.SliceStable(newLane.Tasks, func(i, j int) bool {
+			if newLane.Tasks[i].Priority == newLane.Tasks[j].Priority {
+				return newLane.Tasks[j].ModifiedTime.Before(newLane.Tasks[i].ModifiedTime)
+			}
+
+			return newLane.Tasks[i].Priority > newLane.Tasks[j].Priority
+		})
+
+		newLane.Count = len(lane.Tasks)
+
+		taskLanes[i] = newLane
 
 	}
 
