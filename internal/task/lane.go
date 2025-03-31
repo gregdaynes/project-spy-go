@@ -14,17 +14,8 @@ import (
 
 type TaskLanes []TaskLane
 
-type TaskLane struct {
-	Name     string
-	Title    string
-	Slug     string
-	Tasks    Tasks
-	Count    int
-	Selected bool
-}
-
 // TODO remove this and replace with an interface for tasklane
-type TaskLaneDisplay struct {
+type TaskLane struct {
 	Name     string
 	Title    string
 	Slug     string
@@ -66,8 +57,6 @@ func ListTasks(lanes TaskLanes) {
 			log.Fatal(err)
 		}
 
-		tasks := make(Tasks)
-
 		for _, e := range entries {
 			task, err := ParseFile(".projectSpy/" + lane.Slug + "/" + e.Name())
 			if err != nil {
@@ -75,10 +64,9 @@ func ListTasks(lanes TaskLanes) {
 			}
 			// task.Lanes = &lanes
 
-			tasks[e.Name()] = task
+			lane.Tasks = append(lane.Tasks, task)
 		}
 
-		lane.Tasks = tasks
 		lane.Count = len(lane.Tasks)
 		lanes[k] = lane
 	}
@@ -107,24 +95,30 @@ func SetupWatcher(eventBus *event_bus.EventBus[string], lanes TaskLanes) *fsnoti
 					return lane.Slug == laneName
 				})
 
+				j := slices.IndexFunc(lanes[i].Tasks, func(task Task) bool {
+					return task.Filename == filename
+				})
+
 				if event.Has(fsnotify.Create) || event.Has(fsnotify.Write) {
-					_, ok = lanes[i].Tasks[filename]
-					if ok {
-						delete(lanes[i].Tasks, filename)
-						eventBus.Publish("delete", filename)
+					// delete element from slice
+					if j != -1 {
+						lanes[i].Tasks = append(lanes[i].Tasks[:j], lanes[i].Tasks[j+1:]...)
 					}
+					eventBus.Publish("delete", filename)
 
 					task, err := ParseFile(event.Name)
 					if err != nil {
 						log.Fatal(err)
 					}
 
-					lanes[i].Tasks[filename] = task
+					lanes[i].Tasks = append(lanes[i].Tasks, task)
 					eventBus.Publish("update", laneName+"/"+filename)
 				}
 
 				if event.Has(fsnotify.Rename) || event.Has(fsnotify.Remove) {
-					delete(lanes[i].Tasks, filename)
+					if j != -1 {
+						lanes[i].Tasks = append(lanes[i].Tasks[:j], lanes[i].Tasks[j+1:]...)
+					}
 					eventBus.Publish("remove", name)
 				}
 			case err, ok := <-watcher.Errors:
@@ -148,8 +142,8 @@ func SetupWatcher(eventBus *event_bus.EventBus[string], lanes TaskLanes) *fsnoti
 	return watcher
 }
 
-func RenderTaskLanes(config *config.Config, lanes []TaskLane) map[int]TaskLaneDisplay {
-	taskLanes := make(map[int]TaskLaneDisplay)
+func RenderTaskLanes(config *config.Config, lanes []TaskLane) map[int]TaskLane {
+	taskLanes := make(map[int]TaskLane)
 	configLanes := config.Lanes
 
 	for i := 0; i < len(configLanes); i++ {
@@ -167,7 +161,7 @@ func RenderTaskLanes(config *config.Config, lanes []TaskLane) map[int]TaskLaneDi
 		dir := configLane.Dir
 		name := configLane.Name
 
-		newLane := TaskLaneDisplay{
+		newLane := TaskLane{
 			Name:     name,
 			Slug:     dir,
 			Tasks:    make([]Task, 0),

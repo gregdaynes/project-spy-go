@@ -16,10 +16,12 @@ func SearchData(taskLanes task.TaskLanes) string {
 	for i := 0; i < len(taskLanes); i++ {
 		lane := taskLanes[i]
 
-		for fileName, Task := range lane.Tasks {
+		for j := 0; j < len(lane.Tasks); j++ {
+			task := lane.Tasks[j]
+
 			entry := SearchEntry{}
-			entry = append(entry, strings.ToLower(Task.Title+" "+Task.Description))
-			entry = append(entry, slug.Make(lane.Name+"-"+fileName))
+			entry = append(entry, strings.ToLower(task.Title+" "+task.Description))
+			entry = append(entry, slug.Make(lane.Name+"-"+task.Filename))
 			searchData = append(searchData, entry)
 		}
 	}

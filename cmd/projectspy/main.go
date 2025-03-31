@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"github.com/fsnotify/fsnotify"
+	"projectspy.dev/internal/browser"
 	"projectspy.dev/internal/config"
 	event_bus "projectspy.dev/internal/event-bus"
 	"projectspy.dev/internal/task"
@@ -98,10 +99,10 @@ func main() {
 		log.Fatal(err)
 	}
 
-	// err = browser.Open("https://localhost:8443")
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
+	err = browser.Open("https://localhost:8443")
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	log.Fatal(srv.ServeTLS(l, "./tls/cert.pem", "./tls/key.pem"))
 }
@@ -109,6 +110,6 @@ func main() {
 func (app *application) newTemplateData(r *http.Request) web.TemplateData {
 	return web.TemplateData{
 		Message:   "Hello, world!",
-		TaskLanes: make(map[int]task.TaskLaneDisplay),
+		TaskLanes: make(map[int]task.TaskLane),
 	}
 }

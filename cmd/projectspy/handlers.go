@@ -350,9 +350,14 @@ func (app *application) getTask(lane, filename string) (t task.Task, ok bool) {
 	i := slices.IndexFunc(app.taskLanes, func(l task.TaskLane) bool {
 		return l.Name == lane
 	})
-	t, ok = app.taskLanes[i].Tasks[filename]
 
-	return t, ok
+	j := slices.IndexFunc(app.taskLanes[i].Tasks, func(task task.Task) bool {
+		return task.Filename == filename
+	})
+
+	t = app.taskLanes[i].Tasks[j]
+
+	return t, true
 }
 
 func filepath(lane, filename string) string {
