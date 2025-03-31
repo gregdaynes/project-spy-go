@@ -3,30 +3,27 @@ package task
 import (
 	"net/http"
 	"time"
+
+	"github.com/gosimple/slug"
 )
 
 type Tasks map[string]Task
 
 type Task struct {
-	Name            string
-	ID              string
 	Lane            string
 	Title           string
 	RawContents     string
 	DescriptionHTML string
-	Description     string
+	Description     string //  Search data is derived from this
 	Priority        int
 	Tags            []string
-	FullPath        string
 	RelativePath    string
 	Filename        string
 	ModifiedTime    time.Time
 	CreatedTime     time.Time
 	Order           int
-	Actions         map[string]Action
-	ShowDetails     bool
-	Body            string
-	AvailableLanes  map[string]TaskLane
+	Actions         map[string]Action // TODO remove this, it can be derived from a method
+	AvailableLanes  []TaskLane
 }
 
 type Action struct {
@@ -36,29 +33,23 @@ type Action struct {
 	Action string
 }
 
-func (t *Task) HasPriorityOrTags() bool {
-	if t.Priority > 0 || len(t.Tags) > 0 {
-		return true
-	}
-
-	return false
+func (t *Task) ID() string {
+	return slug.Make(t.Lane + "-" + t.Filename)
 }
 
-func GetAvailableLanes(t *Task, lanes map[string]TaskLane) map[string]TaskLane {
-	taskLanes := make(map[string]TaskLane)
-
-	for name, lane := range lanes {
-		taskLanes[name] = TaskLane{
-			Name:     lane.Name,
-			Slug:     lane.Slug,
-			Selected: t.Lane == lane.Name,
-		}
+func (t *Task) GetAvailableLanes(lanes []TaskLane) (taskLanes []TaskLane) {
+	for i := 0; i < len(lanes); i++ {
+		taskLanes = append(taskLanes, TaskLane{
+			Title:    lanes[i].Title,
+			Slug:     lanes[i].Slug,
+			Selected: t.Lane == lanes[i].Slug,
+		})
 	}
 
 	return taskLanes
 }
 
-func GetAvailableActions(t *Task, mode string) map[string]Action {
+func (t *Task) GetAvailableActions(mode string) map[string]Action {
 	actions := make(map[string]Action)
 
 	switch mode {

@@ -16,10 +16,10 @@
       </header>
 
       <dialog-main>
-        <textarea name="content" id="content" form="updateForm">{{ .Body }}</textarea>
+        <textarea name="content" id="content" form="updateForm">{{ .RawContents }}</textarea>
       </dialog-main>
 
-      {{ if .ShowDetails }}
+      {{ if or .Priority .Tags  }}
       <dialog-details>
         {{ if .Priority }}
           <task-priority>
@@ -42,7 +42,7 @@
           <select aria-label="lane" id="lane" name="lane">
             {{ range .AvailableLanes }}
             <option value="{{ .Slug }}" {{ if .Selected }}Selected{{end}}>
-              {{ .Name}}
+              {{ .Title}}
             </option>
             {{ end }}
           </select>

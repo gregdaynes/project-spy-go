@@ -3,6 +3,7 @@ package task
 import (
 	"log"
 	"os"
+	"slices"
 	"sort"
 	"strings"
 
@@ -11,28 +12,29 @@ import (
 	event_bus "projectspy.dev/internal/event-bus"
 )
 
-type TaskLanes map[string]TaskLane
+type TaskLanes []TaskLane
 
 type TaskLane struct {
 	Name     string
+	Title    string
 	Slug     string
-	Path     string
 	Tasks    Tasks
 	Count    int
 	Selected bool
 }
 
+// TODO remove this and replace with an interface for tasklane
 type TaskLaneDisplay struct {
 	Name     string
+	Title    string
 	Slug     string
-	Path     string
 	Tasks    []Task
 	Count    int
 	Selected bool
 }
 
 func NewTaskLanes(config *config.Config) (TaskLanes, error) {
-	var taskLanes = make(TaskLanes)
+	var taskLanes = []TaskLane{}
 
 	files, err := os.ReadDir(".projectSpy")
 	if err != nil {
@@ -43,10 +45,11 @@ func NewTaskLanes(config *config.Config) (TaskLanes, error) {
 	for _, file := range files {
 		for i, lane := range config.Lanes {
 			if file.Name() == lane.Dir {
-				taskLanes[file.Name()] = TaskLane{
-					Slug: file.Name(),
-					Name: file.Name(),
-				}
+				taskLanes = append(taskLanes, TaskLane{
+					Slug:  file.Name(),
+					Name:  file.Name(),
+					Title: config.Lanes[i].Name,
+				})
 
 				config.Lanes[i].HasDir = true
 			}
@@ -70,6 +73,7 @@ func ListTasks(lanes TaskLanes) {
 			if err != nil {
 				log.Fatal(err)
 			}
+			// task.Lanes = &lanes
 
 			tasks[e.Name()] = task
 		}
@@ -99,15 +103,14 @@ func SetupWatcher(eventBus *event_bus.EventBus[string], lanes TaskLanes) *fsnoti
 				laneName := strings.Split(name, "/")[0]
 				filename := strings.Split(name, "/")[1]
 
-				if event.Has(fsnotify.Create) || event.Has(fsnotify.Write) {
-					lane, ok := lanes[laneName]
-					if !ok {
-						log.Fatal("lane not found", laneName)
-					}
+				i := slices.IndexFunc(lanes, func(lane TaskLane) bool {
+					return lane.Slug == laneName
+				})
 
-					_, ok = lane.Tasks[filename]
+				if event.Has(fsnotify.Create) || event.Has(fsnotify.Write) {
+					_, ok = lanes[i].Tasks[filename]
 					if ok {
-						delete(lane.Tasks, filename)
+						delete(lanes[i].Tasks, filename)
 						eventBus.Publish("delete", filename)
 					}
 
@@ -116,12 +119,12 @@ func SetupWatcher(eventBus *event_bus.EventBus[string], lanes TaskLanes) *fsnoti
 						log.Fatal(err)
 					}
 
-					lanes[laneName].Tasks[filename] = task
+					lanes[i].Tasks[filename] = task
 					eventBus.Publish("update", laneName+"/"+filename)
 				}
 
 				if event.Has(fsnotify.Rename) || event.Has(fsnotify.Remove) {
-					delete(lanes[laneName].Tasks, filename)
+					delete(lanes[i].Tasks, filename)
 					eventBus.Publish("remove", name)
 				}
 			case err, ok := <-watcher.Errors:
@@ -139,14 +142,13 @@ func SetupWatcher(eventBus *event_bus.EventBus[string], lanes TaskLanes) *fsnoti
 			log.Fatal(err)
 		}
 
-		lane.Path = "test"
 		lanes[k] = lane
 	}
 
 	return watcher
 }
 
-func RenderTaskLanes(config *config.Config, lanes map[string]TaskLane) map[int]TaskLaneDisplay {
+func RenderTaskLanes(config *config.Config, lanes []TaskLane) map[int]TaskLaneDisplay {
 	taskLanes := make(map[int]TaskLaneDisplay)
 	configLanes := config.Lanes
 
@@ -157,20 +159,22 @@ func RenderTaskLanes(config *config.Config, lanes map[string]TaskLane) map[int]T
 			continue
 		}
 
+		j := slices.IndexFunc(lanes, func(lane TaskLane) bool {
+			return lane.Slug == configLane.Dir
+		})
+		lane := lanes[j]
+
 		dir := configLane.Dir
 		name := configLane.Name
-		lane := lanes[dir]
 
 		newLane := TaskLaneDisplay{
 			Name:     name,
 			Slug:     dir,
-			Path:     "test",
 			Tasks:    make([]Task, 0),
 			Selected: false,
 		}
 
 		for _, task := range lane.Tasks {
-			task.Actions = GetAvailableActions(&task, "view")
 			newLane.Tasks = append(newLane.Tasks, task)
 		}
 

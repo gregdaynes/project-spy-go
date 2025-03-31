@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"os"
 	"regexp"
+	"slices"
 	"strings"
 	"time"
 
@@ -252,17 +253,11 @@ func (app *application) newTask(w http.ResponseWriter, r *http.Request) {
 	data.SearchData = search.SearchData(app.taskLanes)
 	data.TaskLanes = task.RenderTaskLanes(app.config, app.taskLanes)
 
-	newTask := task.Task{
-		Lane: qLane,
-	}
 	data.CurrentTask = task.Task{
-		Title:          "",
-		Body:           "",
-		ShowDetails:    true,
-		Priority:       0,
-		Tags:           []string{},
-		AvailableLanes: task.GetAvailableLanes(&newTask, app.taskLanes),
-		Actions:        task.GetAvailableActions(&newTask, "create"),
+		Title:    "",
+		Priority: 0,
+		Tags:     []string{},
+		Lane:     qLane,
 	}
 	data.ShowTask = true
 
@@ -339,21 +334,23 @@ func (app *application) view(w http.ResponseWriter, r *http.Request) {
 	data.TaskLanes = task.RenderTaskLanes(app.config, app.taskLanes)
 
 	data.CurrentTask = task.Task{
-		Title:          t.Title,
-		Body:           t.RawContents,
-		ShowDetails:    t.HasPriorityOrTags(),
-		Priority:       t.Priority,
-		Tags:           t.Tags,
-		AvailableLanes: task.GetAvailableLanes(&t, app.taskLanes),
-		Actions:        task.GetAvailableActions(&t, "edit"),
+		Title:       t.Title,
+		Priority:    t.Priority,
+		RawContents: t.RawContents,
+		Tags:        t.Tags,
+		Actions:     t.GetAvailableActions("edit"),
 	}
+	data.CurrentTask.AvailableLanes = t.GetAvailableLanes(app.taskLanes)
 	data.ShowTask = true
 
 	app.render(w, r, http.StatusOK, data)
 }
 
 func (app *application) getTask(lane, filename string) (t task.Task, ok bool) {
-	t, ok = app.taskLanes[lane].Tasks[filename]
+	i := slices.IndexFunc(app.taskLanes, func(l task.TaskLane) bool {
+		return l.Name == lane
+	})
+	t, ok = app.taskLanes[i].Tasks[filename]
 
 	return t, ok
 }

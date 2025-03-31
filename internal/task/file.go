@@ -11,7 +11,6 @@ import (
 	"strings"
 
 	"github.com/djherbis/times"
-	"github.com/gosimple/slug"
 	"github.com/yuin/goldmark"
 	"github.com/yuin/goldmark/extension"
 	"github.com/yuin/goldmark/parser"
@@ -55,11 +54,6 @@ func ParseFile(fp string) (task Task, err error) {
 			task.Tags = Tags(text)
 			continue
 		}
-
-		if ds == true {
-			task.Description += text + "\n"
-			continue
-		}
 	}
 
 	t, err := times.Stat(fp)
@@ -83,7 +77,6 @@ func ParseFile(fp string) (task Task, err error) {
 
 	task.Lane = strs[0]
 	task.Filename = strs[1]
-	task.ID = slug.Make(strs[0] + "-" + strs[1])
 
 	description, html := ParseDescription(task.RawContents)
 	task.Description = description

@@ -12,7 +12,6 @@ import (
 	"time"
 
 	"github.com/fsnotify/fsnotify"
-	"projectspy.dev/internal/browser"
 	"projectspy.dev/internal/config"
 	event_bus "projectspy.dev/internal/event-bus"
 	"projectspy.dev/internal/task"
@@ -23,7 +22,7 @@ type application struct {
 	debug         bool
 	logger        *slog.Logger
 	templateCache map[string]*template.Template
-	taskLanes     map[string]task.TaskLane
+	taskLanes     []task.TaskLane
 	watcher       *fsnotify.Watcher
 	eventBus      *event_bus.EventBus[string]
 	config        *config.Config
@@ -99,10 +98,10 @@ func main() {
 		log.Fatal(err)
 	}
 
-	err = browser.Open("https://localhost:8443")
-	if err != nil {
-		log.Fatal(err)
-	}
+	// err = browser.Open("https://localhost:8443")
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
 
 	log.Fatal(srv.ServeTLS(l, "./tls/cert.pem", "./tls/key.pem"))
 }
