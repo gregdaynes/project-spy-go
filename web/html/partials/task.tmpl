@@ -38,7 +38,10 @@
       {{ end }}
 
       <footer>
-		  <form id="updateForm" method="{{ .Actions.update.Method }}" action="{{ .Actions.update.Action }}">
+		  {{ $Actions := .GetAvailableActions "edit" }}
+
+		  <form id="updateForm" method="{{ $Actions.update.Method }}" action="{{ $Actions.update.Action }}">
+
           <select aria-label="lane" id="lane" name="lane">
             {{ range .AvailableLanes }}
             <option value="{{ .Slug }}" {{ if .Selected }}Selected{{end}}>
@@ -48,18 +51,18 @@
           </select>
 
             <button-group>
-              <button type="submit" formmethod="{{ .Actions.save.Method }}" formaction="{{ .Actions.save.Action }}">{{ .Actions.save.Label }}</button>
+              <button type="submit" formmethod="{{ $Actions.save.Method }}" formaction="{{ $Actions.save.Action }}">{{ $Actions.save.Label }}</button>
 
-                {{ if or .Actions.delete .Actions.archive }}
+                {{ if or $Actions.delete $Actions.archive }}
                 <details class="dropdown">
                   <summary></summary>
 
                   <div>
-                    {{ if .Actions.delete }}
-                    <button type="submit" formmethod="{{ .Actions.delete.Method }}" formaction=" {{ .Actions.delete.Action }}">{{ .Actions.delete.Label }}</button>
+                    {{ if $Actions.delete }}
+                    <button type="submit" formmethod="{{ $Actions.delete.Method }}" formaction=" {{ $Actions.delete.Action }}">{{ $Actions.delete.Label }}</button>
                     {{end }}
-                    {{ if .Actions.archive }}
-                      <button type="submit" formmethod="{{ .Actions.archive.Method }}" formaction="{{ .Actions.archive.Action }}">{{ .Actions.archive.Label }}</button>
+                    {{ if $Actions.archive }}
+                      <button type="submit" formmethod="{{ $Actions.archive.Method }}" formaction="{{ $Actions.archive.Action }}">{{ $Actions.archive.Label }}</button>
                     {{ end }}
                   </div>
                 </details>

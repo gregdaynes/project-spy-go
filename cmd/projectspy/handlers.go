@@ -338,9 +338,7 @@ func (app *application) view(w http.ResponseWriter, r *http.Request) {
 		Priority:    t.Priority,
 		RawContents: t.RawContents,
 		Tags:        t.Tags,
-		Actions:     t.GetAvailableActions("edit"),
 	}
-	data.CurrentTask.AvailableLanes = t.GetAvailableLanes(app.taskLanes)
 	data.ShowTask = true
 
 	app.render(w, r, http.StatusOK, data)

@@ -22,8 +22,7 @@ type Task struct {
 	ModifiedTime    time.Time
 	CreatedTime     time.Time
 	Order           int
-	Actions         map[string]Action // TODO remove this, it can be derived from a method
-	AvailableLanes  []TaskLane
+	Lanes           []*TaskLane
 }
 
 type Action struct {
@@ -33,23 +32,23 @@ type Action struct {
 	Action string
 }
 
-func (t *Task) ID() string {
+func (t Task) ID() string {
 	return slug.Make(t.Lane + "-" + t.Filename)
 }
 
-func (t *Task) GetAvailableLanes(lanes []TaskLane) (taskLanes []TaskLane) {
-	for i := 0; i < len(lanes); i++ {
+func (t Task) AvailableLanes() (taskLanes []TaskLane) {
+	for i := 0; i < len(t.Lanes); i++ {
 		taskLanes = append(taskLanes, TaskLane{
-			Title:    lanes[i].Title,
-			Slug:     lanes[i].Slug,
-			Selected: t.Lane == lanes[i].Slug,
+			Title:    t.Lanes[i].Title,
+			Slug:     t.Lanes[i].Slug,
+			Selected: t.Lane == t.Lanes[i].Slug,
 		})
 	}
 
 	return taskLanes
 }
 
-func (t *Task) GetAvailableActions(mode string) map[string]Action {
+func (t Task) GetAvailableActions(mode string) map[string]Action {
 	actions := make(map[string]Action)
 
 	switch mode {
