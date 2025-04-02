@@ -1,7 +1,6 @@
 package main
 
 import (
-	"crypto/tls"
 	"flag"
 	"log"
 	"log/slog"
@@ -78,33 +77,27 @@ func main() {
 		config:        &cfg,
 	}
 
-	tlsConfig := &tls.Config{
-		CurvePreferences: []tls.CurveID{tls.X25519, tls.CurveP256},
-		MinVersion:       tls.VersionTLS13,
-	}
-
 	srv := &http.Server{
 		Addr:         *addr,
 		Handler:      app.routes(),
 		ErrorLog:     slog.NewLogLogger(logger.Handler(), slog.LevelError),
-		TLSConfig:    tlsConfig,
 		IdleTimeout:  time.Minute,
 		ReadTimeout:  time.Second * 5,
 		WriteTimeout: time.Second * 10,
 	}
 
-	logger.Info("starting server", slog.String("addr", *addr))
+	// logger.Info("starting server", slog.String("addr", *addr))
 	l, err := net.Listen("tcp", ":8443")
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	err = browser.Open("https://localhost:8443")
+	err = browser.Open("http://localhost:8443")
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	log.Fatal(srv.ServeTLS(l, "./tls/cert.pem", "./tls/key.pem"))
+	log.Fatal(srv.Serve(l))
 }
 
 func (app *application) newTemplateData(_ *http.Request) web.TemplateData {
