@@ -6,7 +6,7 @@ import (
 	"projectspy.dev/web"
 )
 
-func (app *application) Routes() http.Handler {
+func (app *application) routes() http.Handler {
 	mux := http.NewServeMux()
 
 	mux.Handle("GET /static/", http.FileServerFS(web.Files))

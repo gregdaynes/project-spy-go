@@ -7,22 +7,19 @@ import (
 	"github.com/gosimple/slug"
 )
 
-type Tasks map[string]Task
-
 type Task struct {
-	Lane            string
-	Title           string
-	RawContents     string
-	DescriptionHTML string
-	Description     string //  Search data is derived from this
-	Priority        int
-	Tags            []string
-	RelativePath    string
-	Filename        string
-	ModifiedTime    time.Time
-	CreatedTime     time.Time
-	Order           int
-	Lanes           []*TaskLane
+	Lane         string
+	Title        string
+	RawContents  string
+	Description  string
+	Priority     int
+	Tags         []string
+	RelativePath string
+	Filename     string
+	ModifiedTime time.Time
+	CreatedTime  time.Time
+	Order        int
+	Lanes        []Lane
 }
 
 type Action struct {
@@ -36,9 +33,9 @@ func (t Task) ID() string {
 	return slug.Make(t.Lane + "-" + t.Filename)
 }
 
-func (t Task) AvailableLanes() (taskLanes []TaskLane) {
+func (t Task) AvailableLanes() (taskLanes []Lane) {
 	for i := 0; i < len(t.Lanes); i++ {
-		taskLanes = append(taskLanes, TaskLane{
+		taskLanes = append(taskLanes, Lane{
 			Title:    t.Lanes[i].Title,
 			Slug:     t.Lanes[i].Slug,
 			Selected: t.Lane == t.Lanes[i].Slug,

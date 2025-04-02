@@ -30,14 +30,14 @@ func (app *application) archive(w http.ResponseWriter, r *http.Request) {
 	}
 
 	data := app.newTemplateData(r)
-	data.SearchData = search.SearchData(app.taskLanes)
+	data.SearchData = search.Data(app.taskLanes)
 	data.TaskLanes = task.RenderTaskLanes(app.config, app.taskLanes)
 	data.ShowConfirm = true
 	data.Confirm = web.Confirm{
 		Title: "Archive",
 		Body:  "Are you sure you want to archive task <samp>" + t.Title + "</samp>?",
 	}
-	data.Confirm.Actions = make(map[string]task.Action, 0)
+	data.Confirm.Actions = make(map[string]task.Action)
 	data.Confirm.Actions["Confirm"] = task.Action{
 		Label:  "Archive",
 		Name:   "archive",
@@ -127,14 +127,14 @@ func (app *application) delete(w http.ResponseWriter, r *http.Request) {
 	}
 
 	data := app.newTemplateData(r)
-	data.SearchData = search.SearchData(app.taskLanes)
+	data.SearchData = search.Data(app.taskLanes)
 	data.TaskLanes = task.RenderTaskLanes(app.config, app.taskLanes)
 	data.ShowConfirm = true
 	data.Confirm = web.Confirm{
 		Title: "Delete",
 		Body:  "Are you sure you want to delete task <samp>" + t.Title + "</samp>?",
 	}
-	data.Confirm.Actions = make(map[string]task.Action, 0)
+	data.Confirm.Actions = make(map[string]task.Action)
 	data.Confirm.Actions["Confirm"] = task.Action{
 		Label:  "Delete",
 		Name:   "delete",
@@ -183,7 +183,7 @@ func (app *application) deleteConfirm(w http.ResponseWriter, r *http.Request) {
 
 func (app *application) home(w http.ResponseWriter, r *http.Request) {
 	data := app.newTemplateData(r)
-	data.SearchData = search.SearchData(app.taskLanes)
+	data.SearchData = search.Data(app.taskLanes)
 	data.TaskLanes = task.RenderTaskLanes(app.config, app.taskLanes)
 
 	app.render(w, r, http.StatusOK, data)
@@ -191,7 +191,7 @@ func (app *application) home(w http.ResponseWriter, r *http.Request) {
 
 func (app *application) info(w http.ResponseWriter, r *http.Request) {
 	data := app.newTemplateData(r)
-	data.SearchData = search.SearchData(app.taskLanes)
+	data.SearchData = search.Data(app.taskLanes)
 	data.TaskLanes = task.RenderTaskLanes(app.config, app.taskLanes)
 	data.ShowInfo = true
 	app.render(w, r, http.StatusOK, data)
@@ -250,7 +250,7 @@ func (app *application) newTask(w http.ResponseWriter, r *http.Request) {
 	qLane := r.URL.Query()["lane"][0]
 
 	data := app.newTemplateData(r)
-	data.SearchData = search.SearchData(app.taskLanes)
+	data.SearchData = search.Data(app.taskLanes)
 	data.TaskLanes = task.RenderTaskLanes(app.config, app.taskLanes)
 
 	data.CurrentTask = task.Task{
@@ -330,7 +330,7 @@ func (app *application) view(w http.ResponseWriter, r *http.Request) {
 	}
 
 	data := app.newTemplateData(r)
-	data.SearchData = search.SearchData(app.taskLanes)
+	data.SearchData = search.Data(app.taskLanes)
 	data.TaskLanes = task.RenderTaskLanes(app.config, app.taskLanes)
 
 	data.CurrentTask = task.Task{
@@ -338,6 +338,7 @@ func (app *application) view(w http.ResponseWriter, r *http.Request) {
 		Priority:    t.Priority,
 		RawContents: t.RawContents,
 		Tags:        t.Tags,
+		Lanes:       app.taskLanes,
 	}
 	data.ShowTask = true
 
@@ -345,7 +346,7 @@ func (app *application) view(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *application) getTask(lane, filename string) (t task.Task, ok bool) {
-	i := slices.IndexFunc(app.taskLanes, func(l task.TaskLane) bool {
+	i := slices.IndexFunc(app.taskLanes, func(l task.Lane) bool {
 		return l.Name == lane
 	})
 

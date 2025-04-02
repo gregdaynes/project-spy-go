@@ -14,7 +14,7 @@ import (
 	"github.com/fsnotify/fsnotify"
 	"projectspy.dev/internal/browser"
 	"projectspy.dev/internal/config"
-	event_bus "projectspy.dev/internal/event-bus"
+	eventBus "projectspy.dev/internal/event-bus"
 	"projectspy.dev/internal/task"
 	"projectspy.dev/web"
 )
@@ -23,9 +23,9 @@ type application struct {
 	debug         bool
 	logger        *slog.Logger
 	templateCache map[string]*template.Template
-	taskLanes     []task.TaskLane
+	taskLanes     []task.Lane
 	watcher       *fsnotify.Watcher
-	eventBus      *event_bus.EventBus[string]
+	eventBus      *eventBus.EventBus[string]
 	config        *config.Config
 }
 
@@ -62,7 +62,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	eventBus := event_bus.NewEventBus[string]()
+	eventBus := eventBus.NewEventBus[string]()
 
 	watcher := task.SetupWatcher(eventBus, taskLanes)
 
@@ -85,7 +85,7 @@ func main() {
 
 	srv := &http.Server{
 		Addr:         *addr,
-		Handler:      app.Routes(),
+		Handler:      app.routes(),
 		ErrorLog:     slog.NewLogLogger(logger.Handler(), slog.LevelError),
 		TLSConfig:    tlsConfig,
 		IdleTimeout:  time.Minute,
@@ -107,9 +107,9 @@ func main() {
 	log.Fatal(srv.ServeTLS(l, "./tls/cert.pem", "./tls/key.pem"))
 }
 
-func (app *application) newTemplateData(r *http.Request) web.TemplateData {
+func (app *application) newTemplateData(_ *http.Request) web.TemplateData {
 	return web.TemplateData{
 		Message:   "Hello, world!",
-		TaskLanes: make(map[int]task.TaskLane),
+		TaskLanes: make(map[int]task.Lane),
 	}
 }

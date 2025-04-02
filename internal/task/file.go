@@ -17,7 +17,7 @@ import (
 	"github.com/yuin/goldmark/renderer/html"
 )
 
-func ParseFile(fp string) (task Task, err error) {
+func parseFile(fp string) (task Task, err error) {
 	data, err := os.Open(fp)
 	if err != nil {
 		log.Fatal(err)
@@ -48,10 +48,10 @@ func ParseFile(fp string) (task Task, err error) {
 		}
 
 		if ds == false {
-			task.Title += ParseTitle(text)
-			task.Priority = Priority(text)
-			task.Order = Order(text)
-			task.Tags = Tags(text)
+			task.Title += parseTitle(text)
+			task.Priority = priority(text)
+			task.Order = order(text)
+			task.Tags = tags(text)
 			continue
 		}
 	}
@@ -73,38 +73,37 @@ func ParseFile(fp string) (task Task, err error) {
 	}
 	task.RelativePath = relative
 
-	strs := strings.Split(relative, "/")
+	fnParts := strings.Split(relative, "/")
 
-	task.Lane = strs[0]
-	task.Filename = strs[1]
+	task.Lane = fnParts[0]
+	task.Filename = fnParts[1]
 
-	description, html := ParseDescription(task.RawContents)
+	description := parseDescription(task.RawContents)
 	task.Description = description
-	task.DescriptionHTML = html
 
 	return task, nil
 }
 
-func Priority(title string) (priority int) {
+func priority(title string) (priority int) {
 	r := regexp.MustCompile(`!+`)
 	s := r.FindString(title)
 
 	return len(s)
 }
 
-func Order(title string) (order int) {
+func order(title string) (order int) {
 	r := regexp.MustCompile(`(\d+)`)
 	o := r.FindString(title)
 
 	order, err := strconv.Atoi(o)
 	if err != nil {
-		fmt.Errorf("Error getting order from title %s", title)
+		fmt.Errorf("error getting order from title %s", title)
 	}
 
 	return order
 }
 
-func Tags(title string) (tags []string) {
+func tags(title string) (tags []string) {
 	r := regexp.MustCompile(`\[([^\]]+)\]`)
 
 	m := r.FindAllStringSubmatch(title, -1)
@@ -115,7 +114,7 @@ func Tags(title string) (tags []string) {
 	return tags
 }
 
-func ParseTitle(title string) (parsedTitle string) {
+func parseTitle(title string) (parsedTitle string) {
 	// remove priority
 	r := regexp.MustCompile(`!+`)
 	title = r.ReplaceAllString(title, "")
@@ -131,8 +130,8 @@ func ParseTitle(title string) (parsedTitle string) {
 	return title
 }
 
-func ParseDescription(text string) (output, outputHTML string) {
-	reChangelog := regexp.MustCompile(`(?:\n---\n\n)(?:(?:\d{4}-\d{2}-\d{2} \d{2}:\d{2}\t.*)\n?)+`)
+func parseDescription(text string) (output string) {
+	reChangelog := regexp.MustCompile(`\n---\n\n(?:\d{4}-\d{2}-\d{2} \d{2}:\d{2}\t.*\n?)+`)
 	reHeader := regexp.MustCompile(`.+\n===+\n|.+\n---+\n|#+\s.+\n`)
 	output = text
 	output = reChangelog.ReplaceAllString(output, "")
@@ -155,5 +154,5 @@ func ParseDescription(text string) (output, outputHTML string) {
 		panic(err)
 	}
 
-	return output, buf.String()
+	return output
 }

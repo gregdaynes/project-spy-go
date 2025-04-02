@@ -6,13 +6,13 @@ import (
 	"os"
 )
 
-type ConfigLane struct {
+type configLane struct {
 	Dir    string `json:"dir"`
 	Name   string `json:"name"`
 	HasDir bool
 }
 type Config struct {
-	Lanes []ConfigLane `json:"lanes"`
+	Lanes []configLane `json:"lanes"`
 }
 
 func NewConfiguration() (config Config, err error) {
@@ -24,7 +24,7 @@ func NewConfiguration() (config Config, err error) {
 	file, err := os.ReadFile(cwd + "/.projectSpy/projectspy.json")
 	if err != nil {
 		config = Config{
-			Lanes: []ConfigLane{
+			Lanes: []configLane{
 				{
 					Dir:  "inbox",
 					Name: "Inbox",

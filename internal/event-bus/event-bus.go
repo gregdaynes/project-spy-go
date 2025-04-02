@@ -5,22 +5,22 @@ import (
 )
 
 type EventBus[t any] struct {
-	subscribers map[EventType]map[Subscriber]struct{}
+	subscribers map[eventType]map[Subscriber]struct{}
 	mutex       sync.Mutex
 }
 
-type EventType string
+type eventType string
 
 type Subscriber *func(string)
 
 func NewEventBus[T any]() *EventBus[T] {
 
 	return &EventBus[T]{
-		subscribers: make(map[EventType]map[Subscriber]struct{}),
+		subscribers: make(map[eventType]map[Subscriber]struct{}),
 	}
 }
 
-func (eb *EventBus[T]) Subscribe(eventType EventType, subscriber Subscriber) {
+func (eb *EventBus[T]) Subscribe(eventType eventType, subscriber Subscriber) {
 	eb.mutex.Lock()
 	defer eb.mutex.Unlock()
 
@@ -31,7 +31,7 @@ func (eb *EventBus[T]) Subscribe(eventType EventType, subscriber Subscriber) {
 	eb.subscribers[eventType][subscriber] = struct{}{}
 }
 
-func (eb *EventBus[T]) Unsubscribe(eventType EventType, subscriber Subscriber) {
+func (eb *EventBus[T]) Unsubscribe(eventType eventType, subscriber Subscriber) {
 	eb.mutex.Lock()
 	defer eb.mutex.Unlock()
 
@@ -44,7 +44,7 @@ func (eb *EventBus[T]) Unsubscribe(eventType EventType, subscriber Subscriber) {
 	}
 }
 
-func (eb *EventBus[T]) Publish(eventType EventType, event string) {
+func (eb *EventBus[T]) Publish(eventType eventType, event string) {
 	eb.mutex.Lock()
 	defer eb.mutex.Unlock()
 

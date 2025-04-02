@@ -26,7 +26,10 @@ func (app *application) render(w http.ResponseWriter, r *http.Request, status in
 	}
 
 	w.WriteHeader(status)
-	buf.WriteTo(w)
+	_, err = buf.WriteTo(w)
+	if err != nil {
+		return
+	}
 }
 
 func (app *application) serverError(w http.ResponseWriter, r *http.Request, err error) {

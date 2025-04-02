@@ -9,13 +9,12 @@ import (
 
 	"github.com/fsnotify/fsnotify"
 	"projectspy.dev/internal/config"
-	event_bus "projectspy.dev/internal/event-bus"
+	eventBus "projectspy.dev/internal/event-bus"
 )
 
-type TaskLanes []TaskLane
+type Lanes []Lane
 
-// TODO remove this and replace with an interface for tasklane
-type TaskLane struct {
+type Lane struct {
 	Name     string
 	Title    string
 	Slug     string
@@ -24,19 +23,18 @@ type TaskLane struct {
 	Selected bool
 }
 
-func NewTaskLanes(config *config.Config) (TaskLanes, error) {
-	var taskLanes = []TaskLane{}
+func NewTaskLanes(config *config.Config) (Lanes, error) {
+	var taskLanes []Lane
 
 	files, err := os.ReadDir(".projectSpy")
 	if err != nil {
 		log.Fatal(err)
-		os.Exit(1)
 	}
 
 	for _, file := range files {
 		for i, lane := range config.Lanes {
 			if file.Name() == lane.Dir {
-				taskLanes = append(taskLanes, TaskLane{
+				taskLanes = append(taskLanes, Lane{
 					Slug:  file.Name(),
 					Name:  file.Name(),
 					Title: config.Lanes[i].Name,
@@ -50,7 +48,7 @@ func NewTaskLanes(config *config.Config) (TaskLanes, error) {
 	return taskLanes, nil
 }
 
-func ListTasks(lanes TaskLanes) {
+func ListTasks(lanes Lanes) {
 	for k, lane := range lanes {
 		entries, err := os.ReadDir(".projectSpy/" + lane.Slug)
 		if err != nil {
@@ -58,7 +56,7 @@ func ListTasks(lanes TaskLanes) {
 		}
 
 		for _, e := range entries {
-			task, err := ParseFile(".projectSpy/" + lane.Slug + "/" + e.Name())
+			task, err := parseFile(".projectSpy/" + lane.Slug + "/" + e.Name())
 			if err != nil {
 				log.Fatal(err)
 			}
@@ -72,7 +70,7 @@ func ListTasks(lanes TaskLanes) {
 	}
 }
 
-func SetupWatcher(eventBus *event_bus.EventBus[string], lanes TaskLanes) *fsnotify.Watcher {
+func SetupWatcher(eventBus *eventBus.EventBus[string], lanes Lanes) *fsnotify.Watcher {
 	watcher, err := fsnotify.NewWatcher()
 	if err != nil {
 		log.Fatal(err)
@@ -91,7 +89,7 @@ func SetupWatcher(eventBus *event_bus.EventBus[string], lanes TaskLanes) *fsnoti
 				laneName := strings.Split(name, "/")[0]
 				filename := strings.Split(name, "/")[1]
 
-				i := slices.IndexFunc(lanes, func(lane TaskLane) bool {
+				i := slices.IndexFunc(lanes, func(lane Lane) bool {
 					return lane.Slug == laneName
 				})
 
@@ -106,7 +104,7 @@ func SetupWatcher(eventBus *event_bus.EventBus[string], lanes TaskLanes) *fsnoti
 					}
 					eventBus.Publish("delete", filename)
 
-					task, err := ParseFile(event.Name)
+					task, err := parseFile(event.Name)
 					if err != nil {
 						log.Fatal(err)
 					}
@@ -142,8 +140,8 @@ func SetupWatcher(eventBus *event_bus.EventBus[string], lanes TaskLanes) *fsnoti
 	return watcher
 }
 
-func RenderTaskLanes(config *config.Config, lanes []TaskLane) map[int]TaskLane {
-	taskLanes := make(map[int]TaskLane)
+func RenderTaskLanes(config *config.Config, lanes []Lane) map[int]Lane {
+	taskLanes := make(map[int]Lane)
 	configLanes := config.Lanes
 
 	for i := 0; i < len(configLanes); i++ {
@@ -153,7 +151,7 @@ func RenderTaskLanes(config *config.Config, lanes []TaskLane) map[int]TaskLane {
 			continue
 		}
 
-		j := slices.IndexFunc(lanes, func(lane TaskLane) bool {
+		j := slices.IndexFunc(lanes, func(lane Lane) bool {
 			return lane.Slug == configLane.Dir
 		})
 		lane := lanes[j]
@@ -161,7 +159,7 @@ func RenderTaskLanes(config *config.Config, lanes []TaskLane) map[int]TaskLane {
 		dir := configLane.Dir
 		name := configLane.Name
 
-		newLane := TaskLane{
+		newLane := Lane{
 			Name:     name,
 			Slug:     dir,
 			Tasks:    make([]Task, 0),
