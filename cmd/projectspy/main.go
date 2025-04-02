@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"log"
 	"log/slog"
 	"net"
@@ -87,12 +88,16 @@ func main() {
 	}
 
 	// logger.Info("starting server", slog.String("addr", *addr))
-	l, err := net.Listen("tcp", ":8443")
+	l, err := net.Listen("tcp", ":0")
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	err = browser.Open("http://localhost:8443")
+	port := fmt.Sprint(l.Addr().(*net.TCPAddr).Port)
+
+	fmt.Printf("Project Spy is running\nhttp://localhost:%v", port)
+
+	err = browser.Open("http://localhost:" + port)
 	if err != nil {
 		log.Fatal(err)
 	}
