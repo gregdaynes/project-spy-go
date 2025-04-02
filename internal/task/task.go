@@ -48,6 +48,10 @@ func (t Task) AvailableLanes() (taskLanes []Lane) {
 func (t Task) GetAvailableActions(mode string) map[string]Action {
 	actions := make(map[string]Action)
 
+	if t.Title == "" {
+		mode = "create"
+	}
+
 	switch mode {
 	case "create":
 		actions["save"] = Action{

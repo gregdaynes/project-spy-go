@@ -258,6 +258,7 @@ func (app *application) newTask(w http.ResponseWriter, r *http.Request) {
 		Priority: 0,
 		Tags:     []string{},
 		Lane:     qLane,
+		Lanes:    app.taskLanes,
 	}
 	data.ShowTask = true
 
@@ -333,13 +334,9 @@ func (app *application) view(w http.ResponseWriter, r *http.Request) {
 	data.SearchData = search.Data(app.taskLanes)
 	data.TaskLanes = task.RenderTaskLanes(app.config, app.taskLanes)
 
-	data.CurrentTask = task.Task{
-		Title:       t.Title,
-		Priority:    t.Priority,
-		RawContents: t.RawContents,
-		Tags:        t.Tags,
-		Lanes:       app.taskLanes,
-	}
+	data.CurrentTask = t
+	data.CurrentTask.Lanes = app.taskLanes
+
 	data.ShowTask = true
 
 	app.render(w, r, http.StatusOK, data)
