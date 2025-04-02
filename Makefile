@@ -2,7 +2,6 @@
 run:
 	go run ./cmd/web
 
-
 .PHONY: dev
 dev:
 	ls **/*.* | entr -cr go run ./cmd/web
@@ -28,3 +27,11 @@ audit:
 	@echo 'Running tests...'
 	go test -race -vet=off ./...
 
+.PHONY: build
+build:
+	go build ./cmd/projectspy
+
+.PHONY: install
+install:
+	mkdir -p $$HOME/bin
+	mv projectspy $$HOME/bin/pspy
