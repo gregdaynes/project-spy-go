@@ -32,7 +32,13 @@ type application struct {
 func main() {
 	addr := flag.String("addr", ":8443", "HTTP network address")
 	debug := flag.Bool("debug", false, "Enable debug mode")
+	init := flag.Bool("init", false, "Initialize the project")
 	flag.Parse()
+
+	if *init {
+		config.InitProject()
+		os.Exit(0)
+	}
 
 	slogHandlerOptions := slog.HandlerOptions{}
 	slogHandlerOptions.Level = slog.LevelInfo
