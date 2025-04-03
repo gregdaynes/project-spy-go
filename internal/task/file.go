@@ -127,6 +127,10 @@ func parseTitle(title string) (parsedTitle string) {
 	r = regexp.MustCompile(`\[([^\]]+)\]`)
 	title = r.ReplaceAllString(title, "")
 
+	// remove octothorpe
+	r = regexp.MustCompile(`#`)
+	title = r.ReplaceAllString(title, "")
+
 	return title
 }
 
