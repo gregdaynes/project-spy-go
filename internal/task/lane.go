@@ -160,12 +160,27 @@ func SetupWatcher(eventBus *eventBus.EventBus[string], lanes Lanes) *fsnotify.Wa
 func RenderTaskLanes(config *config.Config, lanes []Lane) []Lane {
 	for i := 0; i < len(lanes); i++ {
 		lane := lanes[i]
+
+		// Sort tasks by order ascending, then priority and modified time
 		sort.SliceStable(lanes[i].Tasks, func(i, j int) bool {
-			if lane.Tasks[i].Priority == lane.Tasks[j].Priority {
+			if lane.Tasks[i].Order != 0 && lane.Tasks[j].Order == 0 {
+				// Items with Order > 0 come before items with Order == 0
+				return true
+			} else if lane.Tasks[i].Order == 0 && lane.Tasks[j].Order != 0 {
+				// Items with Order == 0 come after items with Order > 0
+				return false
+			} else if lane.Tasks[i].Order != lane.Tasks[j].Order {
+				// Within Order > 0, sort by original Order value
+				return lane.Tasks[i].Order < lane.Tasks[j].Order
+			} else if lane.Tasks[i].Order == 0 && lane.Tasks[j].Order == 0 {
+				// Within Order == 0, sort by Priority and then Modified
+				if lane.Tasks[i].Priority != lane.Tasks[j].Priority {
+					return lane.Tasks[i].Priority > lane.Tasks[j].Priority
+				}
 				return lane.Tasks[j].ModifiedTime.Before(lane.Tasks[i].ModifiedTime)
 			}
 
-			return lane.Tasks[i].Priority > lane.Tasks[j].Priority
+			return false
 		})
 
 		lanes[i].Tasks = lane.Tasks
