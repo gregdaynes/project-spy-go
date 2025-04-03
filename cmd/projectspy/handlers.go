@@ -4,12 +4,12 @@ import (
 	"crypto/sha1"
 	"encoding/hex"
 	"encoding/json"
-	"fmt"
 	"log"
 	"net/http"
 	"os"
 	"regexp"
 	"slices"
+	"strconv"
 	"strings"
 	"time"
 
@@ -65,13 +65,27 @@ func (app *application) archiveConfirm(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	fmt.Println("will wait for", t.RelativePath)
+	slug := strings.TrimSuffix(t.Filename, ".md")
+	filename := slug
+
+	// check if new file already exists, if so, append an incrementing number to the filename
+	i := 1
+	for {
+		_, err := os.Stat(filepath("_archive", filename+".md"))
+		if err != nil {
+			break
+		}
+		filename = slug + "-" + strconv.Itoa(i)
+		i++
+	}
+	filename += ".md"
+
 	ch := make(chan int)
 	waitForWrite := wait(ch, t.RelativePath)
 
 	go func() {
 		app.eventBus.Subscribe("remove", &waitForWrite)
-		err := os.Rename(filepath(t.Lane, t.Filename), filepath("_archive", t.Filename))
+		err := os.Rename(filepath(t.Lane, t.Filename), filepath("_archive", filename))
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -88,11 +102,27 @@ func (app *application) createTask(w http.ResponseWriter, r *http.Request) {
 	qContent := r.FormValue("content")
 	qLane := r.FormValue("lane")
 
-	filename := slug.Make(qName) + ".md"
+	slug := slug.Make(qName)
+
 	content := qName + "\n===\n\n" + qContent
-	path := filepath(qLane, filename)
 
 	content = appendChangelog(content, "Created task")
+
+	filename := slug
+	// check if file already exists, if so, append an incrementing number to the filename
+	i := 1
+	for {
+		_, err := os.Stat(filepath(qLane, filename+".md"))
+		if err != nil {
+			break
+		}
+		filename = slug + "-" + strconv.Itoa(i)
+		i++
+	}
+
+	filename += ".md"
+
+	path := filepath(qLane, filename)
 
 	ch := make(chan int)
 	waitForWrite := wait(ch, qLane+"/"+filename)
@@ -269,13 +299,14 @@ func (app *application) update(w http.ResponseWriter, r *http.Request) {
 	qLane := r.PathValue("lane")
 	qFile := r.PathValue("filename")
 
-	path := filepath(qLane, qFile)
-	_, err := os.ReadFile(path)
+	oldPath := filepath(qLane, qFile)
+	_, err := os.ReadFile(oldPath)
 	if err != nil {
 		log.Fatal("file not found")
 	}
 
 	content := r.FormValue("content")
+	content = scrub(content)
 	newLane := r.FormValue("lane")
 	t, ok := app.getTask(qLane, qFile)
 	if !ok {
@@ -290,9 +321,22 @@ func (app *application) update(w http.ResponseWriter, r *http.Request) {
 
 	content = appendChangelog(content, "Updated task")
 
+	slug := strings.TrimSuffix(qFile, ".md")
+	filename := slug
+	var path string
+
 	if newLane != qLane {
-		oldPath := path
-		path = filepath(newLane, qFile)
+		// check if file already exists, if so, append an incrementing number to the filename
+		i := 1
+		for {
+			_, err := os.Stat(filepath(newLane, filename+".md"))
+			if err != nil {
+				break
+			}
+			filename = slug + "-" + strconv.Itoa(i)
+			i++
+		}
+
 		err := os.Remove(oldPath)
 		if err != nil {
 			log.Fatal(err)
@@ -301,8 +345,11 @@ func (app *application) update(w http.ResponseWriter, r *http.Request) {
 		qLane = newLane
 	}
 
+	filename += ".md"
+	path = filepath(newLane, filename)
+
 	ch := make(chan int)
-	waitForWrite := wait(ch, qLane+"/"+qFile)
+	waitForWrite := wait(ch, newLane+"/"+filename)
 
 	go func() {
 		app.eventBus.Subscribe("update", &waitForWrite)
@@ -312,7 +359,7 @@ func (app *application) update(w http.ResponseWriter, r *http.Request) {
 	<-ch
 	app.eventBus.Unsubscribe("update", &waitForWrite)
 
-	t, ok = app.getTask(qLane, qFile)
+	t, ok = app.getTask(newLane, filename)
 	if !ok {
 		log.Fatal("task not found")
 	}
