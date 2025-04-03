@@ -21,6 +21,7 @@ type Lane struct {
 	Tasks    []Task
 	Count    int
 	Selected bool
+	Order    int
 }
 
 func NewTaskLanes(config *config.Config) (Lanes, error) {
@@ -44,6 +45,22 @@ func NewTaskLanes(config *config.Config) (Lanes, error) {
 			}
 		}
 	}
+
+	for i := 0; i < len(config.Lanes); i++ {
+		j := slices.IndexFunc(taskLanes, func(lane Lane) bool {
+			return lane.Slug == config.Lanes[i].Dir
+		})
+
+		if j == -1 {
+			continue
+		}
+
+		taskLanes[j].Order = i
+	}
+
+	sort.SliceStable(taskLanes, func(i, j int) bool {
+		return taskLanes[i].Order < taskLanes[j].Order
+	})
 
 	return taskLanes, nil
 }
@@ -140,49 +157,20 @@ func SetupWatcher(eventBus *eventBus.EventBus[string], lanes Lanes) *fsnotify.Wa
 	return watcher
 }
 
-func RenderTaskLanes(config *config.Config, lanes []Lane) map[int]Lane {
-	taskLanes := make(map[int]Lane)
-	configLanes := config.Lanes
-
-	for i := 0; i < len(configLanes); i++ {
-		configLane := configLanes[i]
-
-		if configLane.HasDir == false {
-			continue
-		}
-
-		j := slices.IndexFunc(lanes, func(lane Lane) bool {
-			return lane.Slug == configLane.Dir
-		})
-		lane := lanes[j]
-
-		dir := configLane.Dir
-		name := configLane.Name
-
-		newLane := Lane{
-			Name:     name,
-			Slug:     dir,
-			Tasks:    make([]Task, 0),
-			Selected: false,
-		}
-
-		for _, task := range lane.Tasks {
-			newLane.Tasks = append(newLane.Tasks, task)
-		}
-
-		sort.SliceStable(newLane.Tasks, func(i, j int) bool {
-			if newLane.Tasks[i].Priority == newLane.Tasks[j].Priority {
-				return newLane.Tasks[j].ModifiedTime.Before(newLane.Tasks[i].ModifiedTime)
+func RenderTaskLanes(config *config.Config, lanes []Lane) []Lane {
+	for i := 0; i < len(lanes); i++ {
+		lane := lanes[i]
+		sort.SliceStable(lanes[i].Tasks, func(i, j int) bool {
+			if lane.Tasks[i].Priority == lane.Tasks[j].Priority {
+				return lane.Tasks[j].ModifiedTime.Before(lane.Tasks[i].ModifiedTime)
 			}
 
-			return newLane.Tasks[i].Priority > newLane.Tasks[j].Priority
+			return lane.Tasks[i].Priority > lane.Tasks[j].Priority
 		})
 
-		newLane.Count = len(lane.Tasks)
-
-		taskLanes[i] = newLane
-
+		lanes[i].Tasks = lane.Tasks
+		lanes[i].Count = len(lanes[i].Tasks)
 	}
 
-	return taskLanes
+	return lanes
 }

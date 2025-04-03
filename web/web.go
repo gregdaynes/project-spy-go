@@ -12,7 +12,7 @@ var Files embed.FS
 
 type TemplateData struct {
 	Message     string
-	TaskLanes   map[int]task.Lane
+	TaskLanes   []task.Lane
 	CurrentTask task.Task
 	ShowTask    bool
 	ShowInfo    bool

@@ -3,7 +3,7 @@
     {{range .}}
     <task-lane>
         <task-lane-header>
-            <h2>{{ .Name  }}{{ if .Count}} ({{ .Count  }}){{end}}</h2>
+            <h2>{{ .Title  }}{{ if .Count}} ({{ .Count  }}){{end}}</h2>
 
             {{ template "new-task" .Slug}}
 
