@@ -19,12 +19,19 @@ type TemplateData struct {
 	SearchData  string
 	ShowConfirm bool
 	Confirm     Confirm
+	ShowError   bool
+	ErrorDialog ErrorDialog
 }
 
 type Confirm struct {
 	Title   string
 	Body    string
 	Actions map[string]task.Action
+}
+
+type ErrorDialog struct {
+	Title string
+	Body  string
 }
 
 var functions = template.FuncMap{}

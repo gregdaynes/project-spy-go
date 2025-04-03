@@ -3,6 +3,7 @@
 import './filter.js'
 import './task-dialog.js'
 import './info-dialog.js'
+import './error-dialog.js'
 import './confirm-dialog.js'
 
 document.addEventListener('DOMContentLoaded', () => {

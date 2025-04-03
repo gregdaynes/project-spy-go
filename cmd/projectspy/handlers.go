@@ -371,15 +371,20 @@ func (app *application) view(w http.ResponseWriter, r *http.Request) {
 	qLane := r.PathValue("lane")
 	qFile := r.PathValue("filename")
 
-	t, ok := app.getTask(qLane, qFile)
-	if !ok {
-		http.Redirect(w, r, "/", http.StatusSeeOther)
-		return
-	}
-
 	data := app.newTemplateData(r)
 	data.SearchData = search.Data(app.taskLanes)
 	data.TaskLanes = task.RenderTaskLanes(app.config, app.taskLanes)
+
+	t, ok := app.getTask(qLane, qFile)
+	if !ok {
+		data.ShowError = true
+		data.ErrorDialog = web.ErrorDialog{
+			Title: "Task not found",
+			Body:  "The task you are looking for could not be found.",
+		}
+		app.render(w, r, http.StatusNotFound, data)
+		return
+	}
 
 	data.CurrentTask = t
 	data.CurrentTask.Lanes = app.taskLanes
@@ -393,14 +398,18 @@ func (app *application) getTask(lane, filename string) (t task.Task, ok bool) {
 	i := slices.IndexFunc(app.taskLanes, func(l task.Lane) bool {
 		return l.Name == lane
 	})
+	if i == -1 {
+		return task.Task{}, false
+	}
 
 	j := slices.IndexFunc(app.taskLanes[i].Tasks, func(task task.Task) bool {
 		return task.Filename == filename
 	})
+	if j == -1 {
+		return task.Task{}, false
+	}
 
-	t = app.taskLanes[i].Tasks[j]
-
-	return t, true
+	return app.taskLanes[i].Tasks[j], true
 }
 
 func filepath(lane, filename string) string {
