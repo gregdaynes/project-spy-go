@@ -15,8 +15,6 @@ document.addEventListener('DOMContentLoaded', () => {
   if (!filterData) return
   filterData = JSON.parse(filterData)
 
-  console.log(filterData)
-
   const content = template.content.cloneNode(true)
   const button = content.querySelector('button')
   const field = content.querySelector('input')

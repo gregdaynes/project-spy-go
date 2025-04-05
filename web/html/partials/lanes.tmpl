@@ -1,10 +1,12 @@
 {{define "lanes"}}
 <lane-reel>
     {{range .}}
-    <task-lane>
+    <task-lane id="lane-{{ .Slug }}">
         <task-lane-header>
-            <h2>{{ .Title  }}{{ if .Count}} ({{ .Count  }}){{end}}</h2>
-
+			<label for="lane-{{ .Slug }}">
+				<h2>{{ .Title  }}{{ if .Count}} ({{ .Count  }}){{end}}</h2>
+				<input type="checkbox" class="hidden">
+			</label>
             {{ template "new-task" .Slug}}
 
             <hr>

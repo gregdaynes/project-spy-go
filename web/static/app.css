@@ -278,6 +278,7 @@
 		display: flex;
 		flex-direction: column;
 
+		&:has(input[type="checkbox"]:checked),
 		&:has(task-lane-body:empty) {
 			position: relative;
 			padding: var(--s-m);
@@ -303,9 +304,13 @@
 					border-bottom: none;
 				}
 			}
+
+			task-l {
+				display: none;
+			}
 		}
 
-		&:has(task-lane-body:not(:empty)) {
+		&:has(task-lane-body:not(:empty)):not(.collapsed):not(:has(input[type="checkbox"]:checked)) {
 			height: 100%;
 			flex-basis: calc(((100dvw - var(--s-s)) / 3) - (1 * var(--s-s)));
 			min-width: 350px;
@@ -327,6 +332,10 @@
 				flex-grow: 1;
 				margin-block-start: var(--s-s);
 				border: 1px solid;
+			}
+
+			label {
+				cursor: pointer;
 			}
 		}
 
