@@ -1,10 +1,6 @@
 .PHONY: run
 run:
-	go run ./cmd/web
-
-.PHONY: dev
-dev:
-	ls **/*.* | entr -cr go run ./cmd/web
+	go run ./cmd/projectspy
 
 .PHONY: tidy
 tidy:

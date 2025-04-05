@@ -30,7 +30,7 @@ type application struct {
 }
 
 func main() {
-	addr := flag.String("addr", ":8443", "HTTP network address")
+	addr := flag.String("addr", "0", "HTTP network address")
 	debug := flag.Bool("debug", false, "Enable debug mode")
 	init := flag.Bool("init", false, "Initialize the project")
 	flag.Parse()
@@ -94,7 +94,7 @@ func main() {
 	}
 
 	// logger.Info("starting server", slog.String("addr", *addr))
-	l, err := net.Listen("tcp", ":0")
+	l, err := net.Listen("tcp", ":"+*addr)
 	if err != nil {
 		log.Fatal(err)
 	}
