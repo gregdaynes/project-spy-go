@@ -1,5 +1,6 @@
 /* global confirm */
 
+import './mnemonics.js'
 import './filter.js'
 import './task-card.js'
 import './task-lane.js'

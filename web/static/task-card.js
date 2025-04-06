@@ -1,4 +1,6 @@
 class TaskCard extends HTMLElement {
+	static observedAttributes = ["data-mnemonic"];
+
 	constructor () {
 		super()
 
@@ -15,7 +17,7 @@ class TaskCard extends HTMLElement {
 		const viewAction = this.actions.querySelector('a[href*="/view/"]')
 		this.addEventListener('click', () => window.location.href = viewAction)
 		this.addEventListener('keydown', (e) => {
-			if (e.key === 'Enter' || e.key === ' ') {
+			if (e.key === 'Enter') {
 				e.preventDefault()
 				window.location.href = viewAction
 			}
@@ -28,6 +30,11 @@ class TaskCard extends HTMLElement {
 			if (e.key === 'a') {
 				e.preventDefault()
 				window.location.href = this.actions.querySelector('a[href*="/archive/"]')
+			}
+
+			if (e.key === 'Escape') {
+				e.preventDefault()
+				this.blur()
 			}
 		})
 
@@ -47,6 +54,19 @@ class TaskCard extends HTMLElement {
 				action.classList.add('hidden')
 			}
 		})
+	}
+
+	attributeChangedCallback(name, _oldValue, newValue) {
+		if (name === 'data-mnemonic') {
+			this.header.querySelectorAll('.mnemonic').forEach(el => el.remove())
+
+			if (newValue !== null) {
+				const menmonic = document.createElement('span')
+				menmonic.classList.add('mnemonic')
+				menmonic.textContent = newValue
+				this.header.appendChild(menmonic)
+			}
+		}
 	}
 }
 

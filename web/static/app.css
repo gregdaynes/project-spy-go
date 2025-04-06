@@ -396,18 +396,25 @@
 
 		&.enhanced {
 			cursor: pointer;
+			position: relative;
 
 			&:hover {
 				border-bottom: 3px solid;
 				margin-top: -2px;
-
-				task-header {
-				}
 			}
 
 			&:active {
 				border-bottom: 1px solid;
 				margin-top: 0;
+			}
+
+			.mnemonic {
+				color: var(--color-primary);
+				position: absolute;
+				padding: var(--s-2xs) var(--s-xs);
+				inset-block-start: 0;
+				inset-inline-end: 0;
+				display: block;
 			}
 		}
 	}
