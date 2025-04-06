@@ -87,15 +87,24 @@ document.addEventListener('DOMContentLoaded', () => {
     const taskBody = task.querySelector('task-body')
 
     if (str === '') {
+	  if (taskHeader) {
       taskHeader.querySelector('h3').innerHTML = decodeURIComponent(task.getAttribute('data-header-original'))
+			}
+			if (taskBody) {
       taskBody.innerHTML = decodeURIComponent(task.getAttribute('data-body-original'))
+			}
+
       return
     }
 
     const regex = new RegExp(str + '(?![^<]*>)', 'ig')
-    taskHeader.querySelector('h3').innerHTML = decodeURIComponent(task.getAttribute('data-header-original')).replace(regex, '<mark>$&</mark>')
-    taskBody.innerHTML = decodeURIComponent(task.getAttribute('data-body-original')).replace(regex, '<mark>$&</mark>')
-  }
+		if (taskHeader) {
+  	  taskHeader.querySelector('h3').innerHTML = decodeURIComponent(task.getAttribute('data-header-original')).replace(regex, '<mark>$&</mark>')
+		}
+		if (taskBody) {
+	  taskBody.innerHTML = decodeURIComponent(task.getAttribute('data-body-original')).replace(regex, '<mark>$&</mark>')
+		}
+	}
 
   appHeader.appendChild(content)
 })
