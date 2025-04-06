@@ -15,6 +15,7 @@
 		justify-items: center;
 		padding: var(--s-s);
 		align-items: center;
+		position: relative;
 
 		info-dialog {
 			place-self: start;
@@ -265,6 +266,8 @@
 	}
 
 	#filter-input {
+		position: absolute;
+
 		&:not(:focus):placeholder-shown {
 			height: 0;
 			overflow: hidden;
