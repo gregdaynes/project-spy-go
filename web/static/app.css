@@ -268,7 +268,7 @@
 	#filter-input {
 		position: absolute;
 
-		&:not(:focus):placeholder-shown {
+		&:not(:focus):empty:placeholder-shown {
 			height: 0;
 			overflow: hidden;
 			padding: 0;
