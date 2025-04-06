@@ -277,10 +277,10 @@
 	task-lane {
 		display: flex;
 		flex-direction: column;
+		position: relative;
 
 		&:has(input[type="checkbox"]:checked),
 		&:has(task-lane-body:empty) {
-			position: relative;
 			padding: var(--s-m);
 
 			task-lane-header {
@@ -305,7 +305,7 @@
 				}
 			}
 
-			task-l {
+			task-card {
 				display: none;
 			}
 		}
@@ -370,7 +370,7 @@
 		margin: 0 !important;
 	}
 
-	task-l {
+	task-card{
 		border: 1px solid;
 		padding: var(--s-s);
 		display: flex;
@@ -378,9 +378,34 @@
 		gap: var(--s-xs);
 		width: calc(100% - 1px);
 
+		task-body:empty {
+			display: none;
+		}
+
 		task-footer {
 			display: flex;
 			justify-content: space-between;
+		}
+
+		task-footer:empty {
+			display: none;
+		}
+
+		&.enhanced {
+			cursor: pointer;
+
+			&:hover {
+				border-bottom: 3px solid;
+				margin-top: -2px;
+
+				task-header {
+				}
+			}
+
+			&:active {
+				border-bottom: 1px solid;
+				margin-top: 0;
+			}
 		}
 	}
 
@@ -390,4 +415,5 @@
 		background: rgb(30,30,30);
 		opacity: 0.9;
 	}
+
 }

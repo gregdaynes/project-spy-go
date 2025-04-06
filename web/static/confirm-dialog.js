@@ -21,7 +21,7 @@ class ConfirmDialog extends HTMLElement {
     })
   }
 
-  handleEvent (event) {
+  handleEvent () {
     const current = window.location.href
 
     if (current.includes('delete')) {

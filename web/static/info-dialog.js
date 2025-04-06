@@ -39,6 +39,8 @@ class InfoDialog extends HTMLElement {
 
   replaceWithButton (interactor) {
     interactor.classList.add('hidden')
+		interactor.setAttribute('aria-hidden', true)
+		interactor.setAttribute('tabindex', -1)
 
     const button = document.createElement('button')
     button.setAttribute('id', 'show-info')

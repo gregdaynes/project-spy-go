@@ -1,14 +1,17 @@
 document.addEventListener('DOMContentLoaded', () => {
   const template = document.querySelector('#task-filter')
   const appHeader = document.querySelector('application-header')
-  const tasks = document.querySelectorAll('task-l')
+  const tasks = document.querySelectorAll('task-card')
 
   for (const task of tasks) {
     const taskHeader = task.querySelector('task-header')
     const taskBody = task.querySelector('task-body')
 
     task.setAttribute('data-header-original', encodeURIComponent(taskHeader.textContent.trim()))
-    task.setAttribute('data-body-original', encodeURIComponent(taskBody.textContent.trim()))
+
+		if (taskBody) {
+			task.setAttribute('data-body-original', encodeURIComponent(taskBody.textContent.trim()))
+		}
   }
 
   let filterData = document.getElementById('search-data')?.textContent
@@ -18,6 +21,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const content = template.content.cloneNode(true)
   const button = content.querySelector('button')
   const field = content.querySelector('input')
+
+	button.setAttribute('tabindex', -1)
 
   button.addEventListener('click', () => {
     field.focus()

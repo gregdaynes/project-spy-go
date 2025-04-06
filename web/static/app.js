@@ -1,6 +1,7 @@
 /* global confirm */
 
 import './filter.js'
+import './task-card.js'
 import './task-lane.js'
 import './task-dialog.js'
 import './info-dialog.js'

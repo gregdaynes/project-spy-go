@@ -1,0 +1,18 @@
+{{ define "lane" }}
+	<task-lane id="lane-{{ .Slug }}">
+		<task-lane-header>
+			<label for="lane-{{ .Slug }}">
+				<h2>{{ .Title  }}{{ if .Count}} ({{ .Count  }}){{end}}</h2>
+				<input type="checkbox" class="hidden">
+			</label>
+
+			{{ template "new-task" .Slug}}
+
+			<hr>
+		</task-lane-header>
+
+		<task-lane-body>{{ range .Tasks }}
+			{{ template "task-card" . }}
+		{{end}}</task-lane-body>
+	</task-lane>
+{{end}}

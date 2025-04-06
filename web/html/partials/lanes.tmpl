@@ -1,43 +1,7 @@
 {{define "lanes"}}
 <lane-reel>
     {{range .}}
-    <task-lane id="lane-{{ .Slug }}">
-        <task-lane-header>
-			<label for="lane-{{ .Slug }}">
-				<h2>{{ .Title  }}{{ if .Count}} ({{ .Count  }}){{end}}</h2>
-				<input type="checkbox" class="hidden">
-			</label>
-            {{ template "new-task" .Slug}}
-
-            <hr>
-        </task-lane-header>
-
-        <task-lane-body>{{ range .Tasks }}
-            <task-l id="{{ .ID }}">
-                <task-header>
-                    <h3>{{ .Title }}</h3>
-                </task-header>
-
-                <task-body>
-                    {{ .Description }}
-
-                    {{ range .Tags }}
-                    <span>{{ . }}</span>
-                    {{ end }}
-                </task-body>
-
-                <task-footer>
-					<div class="actions">
-						{{range .GetAvailableActions "view"}}
-							<a href="{{ .Action }}">{{ .Label }}</a>
-						{{ end }}
-					</div>
-
-					<div class="priority">{{ range .Priority }}!{{ end }}</div>
-                </task-footer>
-            </task-l>
-        {{end}}</task-lane-body>
-    </task-lane>
+		{{ template "lane" . }}
     {{end}}
 </lane-reel>
 {{end}}

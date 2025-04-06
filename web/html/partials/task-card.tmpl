@@ -1,0 +1,37 @@
+{{ define "task-card" }}
+	<task-card id="{{ .ID }}">
+		<task-header>
+			<h3>{{ .Title }}</h3>
+		</task-header>
+
+		<task-body>
+			{{ .Description }}
+
+
+		</task-body>
+
+		<task-footer>
+			<div class="actions">
+				{{range .GetAvailableActions "view"}}
+					<a href="{{ .Action }}">{{ .Label }}</a>
+				{{ end }}
+			</div>
+
+			<div class="tags">
+			{{ range .Tags }}
+				<span>{{ . }}</span>
+			{{ end }}
+			</div>
+
+			{{ if or .Priority .Order }}
+				{{ if .Priority }}
+					<div class="priority">{{ range .Priority }}!{{ end }}</div>
+				{{ end }}
+
+				{{ if .Order }}
+					<div class="order">{{ .Order }}</div>
+				{{ end }}
+			{{ end }}
+		</task-footer>
+	</task-card>
+{{ end }}
