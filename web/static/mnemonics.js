@@ -1,27 +1,17 @@
 document.addEventListener('DOMContentLoaded', () => {
-	let pauseForMnemonic = false
 	let cardLookup = {}
 	let easyMotion = false
 	let easyMotionTimeout = null
 	let easyMotionKey = []
 
 	document.addEventListener('keydown', (e) => {
-		if (e.key === ' ') {
+		if (e.ctrlKey && e.key === ' ') {
+			document.activeElement.blur()
+
 			clearTimeout(easyMotionTimeout)
 			easyMotion = false
 			easyMotionKey = []
 			cardLookup = {}
-
-			if (!pauseForMnemonic) {
-				pauseForMnemonic = setTimeout(() => {
-					pauseForMnemonic = false
-				}, 250)
-
-				return
-			}
-
-			clearTimeout(pauseForMnemonic)
-			pauseForMnemonic = false
 
 			const cards = document.querySelectorAll('task-card')
 			const alphabet = 'abcdefghijklmnopqrstuvwxyz'.split('')
@@ -67,7 +57,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 				Object.values(cardLookup).forEach(card => card.removeAttribute('data-mnemonic'))
 				cardLookup = {}
-			}, 500)
+			}, 250)
 
 			if (['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'].includes(e.key)) {
 				easyMotionKey.push(e.key)
