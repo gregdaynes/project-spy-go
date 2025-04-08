@@ -277,7 +277,11 @@ func (app *application) manifest(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *application) newTask(w http.ResponseWriter, r *http.Request) {
-	qLane := r.URL.Query()["lane"][0]
+	var qLane string
+
+	if _, ok := r.URL.Query()["lane"]; ok {
+		qLane = r.URL.Query()["lane"][0]
+	}
 
 	data := app.newTemplateData(r)
 	data.SearchData = search.Data(app.taskLanes)
