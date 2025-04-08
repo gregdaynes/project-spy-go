@@ -374,6 +374,8 @@
 	}
 
 	task-card{
+		--_hover: light-dark(rgb(245 245 245), rgb(40 40 40));
+
 		border: 1px solid;
 		padding: var(--s-s);
 		display: flex;
@@ -399,8 +401,7 @@
 			position: relative;
 
 			&:hover {
-				border-bottom: 3px solid;
-				margin-top: -2px;
+				background: var(--_hover);
 			}
 
 			&:active {
@@ -425,5 +426,4 @@
 		background: rgb(30,30,30);
 		opacity: 0.9;
 	}
-
 }
