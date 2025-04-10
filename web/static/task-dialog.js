@@ -38,7 +38,7 @@ class TaskDialog extends HTMLElement {
     this.closeForm.addEventListener('submit', e => {
       e.preventDefault()
 
-      this.dialog.close()
+      this.close()
     }, { signal })
   }
 
@@ -70,13 +70,7 @@ class TaskDialog extends HTMLElement {
 
     if (event.type === 'mouseup') {
       if (event.target === this.downTarget && event.target === this.dialog) {
-        if (this.dialog.getAttribute('is-dirty')) {
-          if (confirm('There are unsaved changes, are you sure?') === true) {
-            this.dialog.close()
-          }
-        } else {
-          this.dialog.close()
-        }
+        this.close()
       }
 
       this.downtarget = null
@@ -85,13 +79,13 @@ class TaskDialog extends HTMLElement {
     if (event.ctrlKey && event.key === 'w') {
       event.preventDefault()
 
-      if (this.dialog.getAttribute('is-dirty')) {
-        if (confirm('There are unsaved changes, are you sure?') === true) {
-          this.dialog.close()
-        }
-      } else {
-        this.dialog.close()
-      }
+      this.close()
+    }
+
+    if (event.key === 'Escape') {
+      event.preventDefault()
+
+      this.close(100)
     }
 
     if (event.ctrlKey && event.key === 's') {
@@ -99,6 +93,19 @@ class TaskDialog extends HTMLElement {
 
       const form = this.textarea.getAttribute('form')
       this.querySelector(`#${form} button`).click()
+    }
+  }
+
+  close (delay = 0) {
+    const msg = 'There are unsaved changes, are you sure?'
+    if (this.dialog.getAttribute('is-dirty')) {
+      setTimeout(() => {
+        if (confirm(msg) === true) {
+          this.dialog.close()
+        }
+      }, delay)
+    } else {
+      this.dialog.close()
     }
   }
 }
