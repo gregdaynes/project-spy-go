@@ -11,7 +11,12 @@ class InfoDialog extends HTMLElement {
   }
 
   connectedCallback () {
-    this.dialog.removeAttribute('open')
+
+    if (this.dialog.hasAttribute('open')) {
+      this.dialog.removeAttribute('open')
+      this.dialog.showModal()
+    }
+
     this.replaceWithButton(this.interactor)
 
     this.eventHotkey = document.addEventListener('keydown', e => {
@@ -24,6 +29,14 @@ class InfoDialog extends HTMLElement {
       if (e.target !== this.dialog) return
 
       this.dialog.close()
+    })
+
+    document.addEventListener('keydown', e => {
+      if (e.ctrlKey && e.key === 'w') {
+        e.preventDefault()
+
+        this.dialog.close()
+      }
     })
 
     this.closeForm.addEventListener('click', e => {

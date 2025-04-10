@@ -93,7 +93,7 @@
 		padding: 0;
 		max-width: 66dvw;
 		max-height: 66dvh;
-		overflow: visible;
+		overflow: scroll;
 
 		&[open] {
 			display: flex;
@@ -425,5 +425,82 @@
 		inset: 0;
 		background: rgb(30,30,30);
 		opacity: 0.9;
+	}
+
+	dialog  {
+		.col-2 {
+			display: grid;
+			grid-template-columns: 1fr 1fr;
+			gap: var(--s-s);
+		}
+
+		dialog-wrapper:has(nav) {
+			padding-block-end: 0;
+
+			footer {
+				padding-inline: 0;
+			}
+		}
+
+		div {
+			flex-direction: column;
+			gap: var(--s-xs);
+		}
+
+		nav {
+			display: flex;
+
+			label {
+				cursor: pointer;
+				flex-grow: 1;
+				outline: 2px solid white;
+				padding: var(--s-2xs);
+				text-align:center;
+			}
+
+			label:has(input:checked) {
+				color: #000;
+				background: #fff;
+			}
+
+			input {
+				display: none;
+			}
+		}
+	}
+
+	#panel-about {
+		display: none;
+	}
+
+	#panel-info {
+		display: none;
+	}
+
+	dialog-wrapper:has(label[for="show-tab-about"] > input:checked) #panel-about {
+		display: flex;
+	}
+
+	dialog-wrapper:has(label[for="show-tab-info"] > input:checked) #panel-info {
+		display: flex;
+	}
+
+	dl {
+		display: grid;
+		grid-template-columns: 2fr 1fr;
+		gap: var(--s-xs);
+
+		&.double {
+			grid-template-columns: 1fr 1fr 1fr 1fr;
+		}
+
+		small {
+			display: block;
+			line-height: 1.1;
+		}
+	}
+
+	dd {
+		place-content: center;
 	}
 }

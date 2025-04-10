@@ -1,0 +1,81 @@
+{{ define "panel-info" }}
+	<div id="panel-info">
+		<header>
+			<h3>Info</h3>
+
+			<form method="get" action="/">
+				<button type="submit" class="icon close"><svg xmlns="http://www.w3.org/2000/svg" aria-label="Close info" fill="currentColor" viewBox="0 0 384 512"><path d="M342.6 150.6a32 32 0 0 0-45.3-45.3L192 210.7 86.6 105.4a32 32 0 0 0-45.3 45.3L146.7 256 41.4 361.4a32 32 0 0 0 45.3 45.3L192 301.3l105.4 105.3a32 32 0 0 0 45.3-45.3L237.3 256l105.3-105.4z"/></svg></button>
+			</form>
+		</header>
+
+		<dl class="double">
+			<dt>Show info (this popup)</dt>
+			<dd>
+				<kbd>Ctrl + ?</kbd>
+			</dd>
+
+			<dt>Find Task</dt>
+			<dd>
+				<kbd>Ctrl + f</kbd>
+			</dd>
+
+			<dt>New task</dt>
+			<dd>
+				<kbd>Ctrl + n</kbd>
+			</dd>
+
+			<dt>Close popup</dt>
+			<dd>
+				<kbd>Ctrl + w</kbd>
+				or
+				<kbd>Esc</kbd>
+			</dd>
+
+			<dt>Quick Save</dt>
+			<dd>
+				<kbd>Ctrl + s</kbd>
+			</dd>
+
+			<dt>
+				Easy Motion
+				<small>Quickly jump to a task by pressing the task keycode.</small>
+			</dt>
+			<dd>
+				<kbd>Ctrl + space</kbd> <kbd>ab</kbd>
+			</dd>
+		</dl>
+
+		<hr>
+
+		<dl>
+			<dt>
+				Priority
+
+				<small>Promote a task to the top of the lane with <code>!</code> in the title. The more <code>!</code> the higher the priority.</small>
+			</dt>
+			<dd>
+				<kbd>!</kbd>
+				<kbd>!!</kbd>
+				or <kbd>!!!</kbd>
+			</dd>
+			<dt>
+				Order
+
+				<small>Specify the order of a task with a number. Eg: <code>(1) My Task</code> would be the first task in the lane.</small>
+			</dt>
+			<dd>
+				<kbd>(1-9)</kbd>
+			</dd>
+
+			<dt>
+				Tags
+
+				<small>Add tags to a task with <code>[tag]</code>. Tags are separated by spaces.</small>
+			</dt>
+			<dd>
+				<kbd>[tag]</kbd>
+				<kbd>[tag1 tag2]</kbd>
+			</dd>
+		</dl>
+	</div>
+{{end}}
