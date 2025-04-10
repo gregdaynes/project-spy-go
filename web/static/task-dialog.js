@@ -102,10 +102,12 @@ class TaskDialog extends HTMLElement {
       setTimeout(() => {
         if (confirm(msg) === true) {
           this.dialog.close()
+          this.dialog.removeAttribute('is-dirty')
         }
       }, delay)
     } else {
       this.dialog.close()
+      this.dialog.removeAttribute('is-dirty')
     }
   }
 }
