@@ -95,6 +95,13 @@
 		max-height: 66dvh;
 		overflow: scroll;
 
+		scrollbar-width: none;
+
+		&::-webkit-scrollbar {
+			width: 0px;
+			background: transparent;
+		}
+
 		&[open] {
 			display: flex;
 			cursor: pointer;
