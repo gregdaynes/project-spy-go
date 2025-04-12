@@ -17,3 +17,7 @@ This should likely be paired with the ability to highlight a task, instead of th
 2025-04-06 00:04	Moved task from inbox to in-progress
 2025-04-09 21:59	Updated task
 2025-04-09 21:59	Moved task from in-progress to backlog
+2025-04-11 21:36	Updated task
+2025-04-11 21:36	Moved task from backlog to in-progress
+2025-04-11 21:37	Updated task
+2025-04-11 21:37	Moved task from in-progress to done

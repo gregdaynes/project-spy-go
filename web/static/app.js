@@ -8,6 +8,7 @@ import './task-dialog.js'
 import './info-dialog.js'
 import './error-dialog.js'
 import './confirm-dialog.js'
+import session from './session-storage.js'
 
 document.addEventListener('DOMContentLoaded', () => {
   document.querySelector('.backdrop').remove()
@@ -26,5 +27,22 @@ document.addEventListener('keydown', (e) => {
     } else {
       window.location.href = '/new'
     }
+  }
+
+  if (e.ctrlKey && e.key === 'b') {
+    e.preventDefault()
+
+    setTimeout(() => {
+      const dialog = document.querySelector('.initial-open')
+      if (dialog) {
+        return
+      }
+
+      const previousTask = session.get('previous-task')
+
+      if (previousTask) {
+        window.location.href = previousTask
+      }
+    }, 100)
   }
 })

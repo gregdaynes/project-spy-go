@@ -1,4 +1,5 @@
 /* global confirm HTMLElement customElements */
+import session from './session-storage.js'
 
 class TaskDialog extends HTMLElement {
   constructor () {
@@ -94,6 +95,18 @@ class TaskDialog extends HTMLElement {
       const form = this.textarea.getAttribute('form')
       this.querySelector(`#${form} button`).click()
     }
+
+    if (event.ctrlKey && event.key === 'b') {
+      event.preventDefault()
+
+      const previousTask = session.get('previous-task')
+
+      this.close()
+
+      if (previousTask) {
+        window.location.href = previousTask
+      }
+    }
   }
 
   close (delay = 0) {
@@ -109,6 +122,8 @@ class TaskDialog extends HTMLElement {
       this.dialog.close()
       this.dialog.removeAttribute('is-dirty')
     }
+
+    session.set('previous-task', window.location.href)
   }
 }
 

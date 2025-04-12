@@ -8,7 +8,7 @@ This may lay the groundwork for a more comprehensive info dialog.
 - [x] Priority & Ordering
 - [x] Easy Motion
 - [x] Closing Dialog
-- [ ] Open previous task
+- [x] Open previous task
 
 Sections, or tabs might be nice to have, allowing for the pages like Info, Stats, About (and maybe even a configuration editor 😅
 
@@ -22,3 +22,6 @@ Sections, or tabs might be nice to have, allowing for the pages like Info, Stats
 2025-04-09 22:01	Updated task
 2025-04-09 22:01	Moved task from inbox to in-progress
 2025-04-09 23:13	Updated task
+2025-04-10 18:35	Updated task
+2025-04-11 21:25	Updated task
+2025-04-11 21:25	Moved task from in-progress to done
