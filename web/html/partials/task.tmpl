@@ -19,8 +19,14 @@
         <textarea name="content" id="content" form="updateForm">{{ .RawContents }}</textarea>
       </dialog-main>
 
-      {{ if or .Priority .Tags  }}
+      {{ if or .Priority .Tags .Order  }}
       <dialog-details>
+        {{ if .Order }}
+          <task-order>
+            Order {{ .Order }}
+          </task-order>
+        {{end}}
+
         {{ if .Priority }}
           <task-priority>
             Priority {{ .Priority }}

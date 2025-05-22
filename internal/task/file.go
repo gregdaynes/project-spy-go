@@ -92,8 +92,12 @@ func priority(title string) (priority int) {
 }
 
 func order(title string) (order int) {
-	r := regexp.MustCompile(`(\d+)`)
-	o := r.FindString(title)
+	r := regexp.MustCompile(`(\()(\d+)(\))`)
+	match := r.FindStringSubmatch(title)
+	var o string
+	if len(match) >= 2 {
+		o = match[2]
+	}
 
 	order, err := strconv.Atoi(o)
 	if err != nil {
