@@ -84,7 +84,7 @@ func (app *application) archiveConfirm(w http.ResponseWriter, r *http.Request) {
 	waitForWrite := wait(ch, t.RelativePath)
 
 	go func() {
-		app.eventBus.Subscribe("remove", &waitForWrite)
+		app.eventBus.Subscribe("remove", "archiveRemove", waitForWrite)
 		err := os.Rename(filepath(t.Lane, t.Filename), filepath("_archive", filename))
 		if err != nil {
 			log.Fatal(err)
@@ -92,7 +92,7 @@ func (app *application) archiveConfirm(w http.ResponseWriter, r *http.Request) {
 	}()
 
 	<-ch
-	app.eventBus.Unsubscribe("remove", &waitForWrite)
+	app.eventBus.Unsubscribe("remove", "archiveRemove")
 
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
@@ -128,7 +128,7 @@ func (app *application) createTask(w http.ResponseWriter, r *http.Request) {
 	waitForWrite := wait(ch, qLane+"/"+filename)
 
 	go func() {
-		app.eventBus.Subscribe("update", &waitForWrite)
+		app.eventBus.Subscribe("update", "createTask", waitForWrite)
 		err := os.WriteFile(path, []byte(content), 0644)
 		if err != nil {
 			log.Fatal(err)
@@ -136,7 +136,7 @@ func (app *application) createTask(w http.ResponseWriter, r *http.Request) {
 	}()
 
 	<-ch
-	app.eventBus.Unsubscribe("update", &waitForWrite)
+	app.eventBus.Unsubscribe("update", "createTask")
 
 	t, ok := app.getTask(qLane, filename)
 	if !ok {
@@ -198,7 +198,7 @@ func (app *application) deleteConfirm(w http.ResponseWriter, r *http.Request) {
 	waitForWrite := wait(ch, t.RelativePath)
 
 	go func() {
-		app.eventBus.Subscribe("remove", &waitForWrite)
+		app.eventBus.Subscribe("remove", "deleteTask", waitForWrite)
 		err := os.Remove(path)
 		if err != nil {
 			log.Fatal(err)
@@ -206,7 +206,7 @@ func (app *application) deleteConfirm(w http.ResponseWriter, r *http.Request) {
 	}()
 
 	<-ch
-	app.eventBus.Unsubscribe("remove", &waitForWrite)
+	app.eventBus.Unsubscribe("remove", "deleteTask")
 
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
@@ -325,19 +325,18 @@ func (app *application) update(w http.ResponseWriter, r *http.Request) {
 
 	content = appendChangelog(content, "Updated task")
 
-	slug := strings.TrimSuffix(qFile, ".md")
-	filename := slug
+	filename := strings.TrimSuffix(qFile, ".md")
 	var path string
 
 	if newLane != qLane {
-		// check if file already exists, if so, append an incrementing number to the filename
+		// check file already exists, if so, append an incrementing number to the filename
 		i := 1
 		for {
 			_, err := os.Stat(filepath(newLane, filename+".md"))
 			if err != nil {
 				break
 			}
-			filename = slug + "-" + strconv.Itoa(i)
+			filename = filename + "-" + strconv.Itoa(i)
 			i++
 		}
 
@@ -356,12 +355,12 @@ func (app *application) update(w http.ResponseWriter, r *http.Request) {
 	waitForWrite := wait(ch, newLane+"/"+filename)
 
 	go func() {
-		app.eventBus.Subscribe("update", &waitForWrite)
+		app.eventBus.Subscribe("update", "update", waitForWrite)
 		err = os.WriteFile(path, []byte(content), 0644)
 	}()
 
 	<-ch
-	app.eventBus.Unsubscribe("update", &waitForWrite)
+	app.eventBus.Unsubscribe("update", "update")
 
 	t, ok = app.getTask(newLane, filename)
 	if !ok {
