@@ -93,7 +93,7 @@
 		padding: 0;
 		max-width: 66dvw;
 		max-height: 66dvh;
-		overflow: scroll;
+		overflow: visible;
 
 		scrollbar-width: none;
 
