@@ -138,12 +138,7 @@ func (app *application) createTask(w http.ResponseWriter, r *http.Request) {
 	<-ch
 	app.eventBus.Unsubscribe("update", "createTask")
 
-	t, ok := app.getTask(qLane, filename)
-	if !ok {
-		log.Fatal("task not found")
-	}
-
-	http.Redirect(w, r, "/view/"+t.RelativePath, http.StatusSeeOther)
+	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
 
 func (app *application) delete(w http.ResponseWriter, r *http.Request) {
