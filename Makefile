@@ -1,6 +1,6 @@
 .PHONY: run
 run:
-	go run ./cmd/projectspy
+	go run ./cmd/projectspy -port=4000
 
 .PHONY: tidy
 tidy:

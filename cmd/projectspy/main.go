@@ -30,7 +30,7 @@ type application struct {
 }
 
 func main() {
-	addr := flag.String("addr", "0", "HTTP network address")
+	port := flag.String("port", "0", "HTTP network port to listen on")
 	debug := flag.Bool("debug", false, "Enable debug mode")
 	init := flag.Bool("init", false, "Initialize the project")
 	flag.Parse()
@@ -85,7 +85,7 @@ func main() {
 	}
 
 	srv := &http.Server{
-		Addr:         *addr,
+		Addr:         *port,
 		Handler:      app.routes(),
 		ErrorLog:     slog.NewLogLogger(logger.Handler(), slog.LevelError),
 		IdleTimeout:  time.Minute,
@@ -93,17 +93,16 @@ func main() {
 		WriteTimeout: time.Second * 10,
 	}
 
-	// logger.Info("starting server", slog.String("addr", *addr))
-	l, err := net.Listen("tcp", ":"+*addr)
+	// logger.Info("starting server", slog.String("port", *port))
+	l, err := net.Listen("tcp", ":"+*port)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	port := fmt.Sprint(l.Addr().(*net.TCPAddr).Port)
+	prt := fmt.Sprint(l.Addr().(*net.TCPAddr).Port)
+	fmt.Printf("Project Spy is running\nhttp://localhost:%v", prt)
 
-	fmt.Printf("Project Spy is running\nhttp://localhost:%v", port)
-
-	err = browser.Open("http://localhost:" + port)
+	err = browser.Open("http://localhost:" + prt)
 	if err != nil {
 		log.Fatal(err)
 	}
