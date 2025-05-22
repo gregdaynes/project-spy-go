@@ -47,7 +47,7 @@ func parseFile(fp string) (task Task, err error) {
 			continue
 		}
 
-		if ds == false {
+		if !ds {
 			task.Title += parseTitle(text)
 			task.Priority = priority(text)
 			task.Order = order(text)
@@ -68,7 +68,7 @@ func parseFile(fp string) (task Task, err error) {
 	}
 
 	relative, ok := strings.CutPrefix(fp, ".projectSpy/")
-	if ok != true {
+	if !ok {
 		log.Fatal("bad time trimming prefix")
 	}
 	task.RelativePath = relative
@@ -94,14 +94,15 @@ func priority(title string) (priority int) {
 func order(title string) (order int) {
 	r := regexp.MustCompile(`(\()(\d+)(\))`)
 	match := r.FindStringSubmatch(title)
-	var o string
-	if len(match) >= 2 {
-		o = match[2]
-	}
 
-	order, err := strconv.Atoi(o)
-	if err != nil {
-		fmt.Errorf("error getting order from title %s", title)
+	if len(match) >= 2 {
+		o, err := strconv.Atoi(match[2])
+		order = o
+
+		if err != nil {
+			errMsg := fmt.Errorf("error getting order from title %s", title)
+			fmt.Println(errMsg)
+		}
 	}
 
 	return order
