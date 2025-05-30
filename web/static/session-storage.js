@@ -3,7 +3,7 @@ export const get = (target) => {
   const cachedString = sessionStorage.getItem(target)
   const cachedData = JSON.parse(cachedString)
 
-  return cachedData?.data
+  return cachedData?.data || cachedData
 }
 
 export const set = (target, data) => {
