@@ -8,6 +8,7 @@ import (
 )
 
 type Task struct {
+	ID           string
 	Lane         string
 	Title        string
 	RawContents  string
@@ -29,7 +30,7 @@ type Action struct {
 	Action string
 }
 
-func (t Task) ID() string {
+func (t Task) FullID() string {
 	return slug.Make(t.Lane + "-" + t.Filename)
 }
 

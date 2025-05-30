@@ -78,6 +78,9 @@ func parseFile(fp string) (task Task, err error) {
 	task.Lane = fnParts[0]
 	task.Filename = fnParts[1]
 
+	r := regexp.MustCompile(`:([\w]*)\.`)
+	task.ID = r.FindStringSubmatch(fnParts[1])[1]
+
 	description := parseDescription(task.RawContents)
 	task.Description = description
 

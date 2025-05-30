@@ -16,6 +16,7 @@ import (
 	"github.com/gosimple/slug"
 	"projectspy.dev/internal/search"
 	"projectspy.dev/internal/task"
+	"projectspy.dev/internal/util"
 	"projectspy.dev/web"
 )
 
@@ -103,12 +104,13 @@ func (app *application) createTask(w http.ResponseWriter, r *http.Request) {
 	qLane := r.FormValue("lane")
 
 	slug := slug.Make(qName)
+	uId := util.GenerateId(slug)
 
 	content := qName + "\n===\n\n" + qContent
-
 	content = appendChangelog(content, "Created task")
 
-	filename := slug
+	filename := slug + ":" + uId
+
 	// check if file already exists, if so, append an incrementing number to the filename
 	i := 1
 	for {
@@ -392,6 +394,31 @@ func (app *application) view(w http.ResponseWriter, r *http.Request) {
 	app.render(w, r, http.StatusOK, data)
 }
 
+func (app *application) viewById(w http.ResponseWriter, r *http.Request) {
+	data := app.newTemplateData(r)
+	data.SearchData = search.Data(app.taskLanes)
+	data.TaskLanes = task.RenderTaskLanes(app.config, app.taskLanes)
+
+	tid := r.PathValue("tid")
+	t, ok := app.getTaskById(tid)
+	if !ok {
+		data.ShowError = true
+		data.ErrorDialog = web.ErrorDialog{
+			Title: "Task not found",
+			Body:  "The task you are looking for could not be found.",
+		}
+		app.render(w, r, http.StatusNotFound, data)
+		return
+	}
+
+	data.CurrentTask = t
+	data.CurrentTask.Lanes = app.taskLanes
+
+	data.ShowTask = true
+
+	app.render(w, r, http.StatusOK, data)
+}
+
 func (app *application) getTask(lane, filename string) (t task.Task, ok bool) {
 	i := slices.IndexFunc(app.taskLanes, func(l task.Lane) bool {
 		return l.Name == lane
@@ -408,6 +435,27 @@ func (app *application) getTask(lane, filename string) (t task.Task, ok bool) {
 	}
 
 	return app.taskLanes[i].Tasks[j], true
+}
+
+func (app *application) getTaskById(tid string) (t task.Task, ok bool) {
+	var iL, iT int
+
+	for i, lane := range app.taskLanes {
+		iT = slices.IndexFunc(lane.Tasks, func(t task.Task) bool {
+			return t.ID == tid
+		})
+
+		if iT != -1 {
+			iL = i
+			break
+		}
+	}
+
+	if iT < 0 {
+		return task.Task{}, false
+	}
+
+	return app.taskLanes[iL].Tasks[iT], true
 }
 
 func filepath(lane, filename string) string {

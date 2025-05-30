@@ -73,11 +73,13 @@ func ListTasks(lanes Lanes) {
 		}
 
 		for _, e := range entries {
-			task, err := parseFile(".projectSpy/" + lane.Slug + "/" + e.Name())
+			dir := ".projectSpy/" + lane.Slug + "/"
+			path := dir + e.Name()
+
+			task, err := parseFile(path)
 			if err != nil {
 				log.Fatal(err)
 			}
-			// task.Lanes = &lanes
 
 			lane.Tasks = append(lane.Tasks, task)
 		}

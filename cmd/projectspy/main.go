@@ -15,6 +15,7 @@ import (
 	"projectspy.dev/internal/browser"
 	"projectspy.dev/internal/config"
 	eventBus "projectspy.dev/internal/event-bus"
+	migrator "projectspy.dev/internal/migrate"
 	"projectspy.dev/internal/task"
 	"projectspy.dev/web"
 )
@@ -33,10 +34,16 @@ func main() {
 	port := flag.String("port", "0", "HTTP network port to listen on")
 	debug := flag.Bool("debug", false, "Enable debug mode")
 	init := flag.Bool("init", false, "Initialize the project")
+	migrate := flag.Bool("migrate", false, "Migrate old task formats to latest task format")
 	flag.Parse()
 
 	if *init {
 		config.InitProject()
+		os.Exit(0)
+	}
+
+	if *migrate {
+		migrator.MigrateProject()
 		os.Exit(0)
 	}
 
@@ -72,6 +79,7 @@ func main() {
 
 	watcher := task.SetupWatcher(eventBus, taskLanes)
 
+	// initialize tasks in each lane
 	task.ListTasks(taskLanes)
 
 	app := &application{

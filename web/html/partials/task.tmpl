@@ -2,12 +2,12 @@
 <task-dialog>
   <dialog open>
     <dialog-wrapper>
-	  <header {{ if .Title }}class="with-title"{{ end }}>
-        {{ if .Title }}
-			<h3>{{ .Title }}</h3>
+			<header {{ if .Title }}class="with-title"{{ end }}>
+				{{ if .Title }}
+					<h3>{{ .Title }}</h3>
         {{ else }}
-			<label for="name">New task name</label>
-			<input type="text" name="name" id="name" form="updateForm" placeholder="My task to be done">
+					<label for="name">New task name</label>
+					<input type="text" name="name" id="name" form="updateForm" placeholder="My task to be done">
         {{ end }}
 
         <form id="task-dialog-close" method="get" action="/">
@@ -19,8 +19,11 @@
         <textarea name="content" id="content" form="updateForm">{{ .RawContents }}</textarea>
       </dialog-main>
 
-      {{ if or .Priority .Tags .Order  }}
       <dialog-details>
+				{{ if .ID }}
+					<task-id>#{{ .ID }}</task-id>
+				{{ end }}
+
         {{ if .Order }}
           <task-order>
             Order {{ .Order }}
@@ -41,7 +44,6 @@
           </task-tags>
         {{ end }}
       </dialog-details>
-      {{ end }}
 
       <footer>
 		  {{ $Actions := .GetAvailableActions "edit" }}

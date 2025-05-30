@@ -169,11 +169,16 @@
 
 			dialog-details {
 				display: flex;
-				justify-content: space-between;
 				align-items: center;
+				gap: var(--s-xs)
 			}
 
 			task-priority {
+				border: 1px solid;
+				padding: var(--s-2xs);
+			}
+
+			task-id {
 				border: 1px solid;
 				padding: var(--s-2xs);
 			}
