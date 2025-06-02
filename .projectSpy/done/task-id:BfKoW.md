@@ -7,9 +7,8 @@ something simple - maybe 5-6 characters of a hash on timestamp and title? or bod
 
 defining a route that could receive a task id to open it directly.
 
----
-
-2025-05-11 21:26	Created task
-2025-05-11 21:28	Updated task
-2025-06-01 17:10	Updated task
-2025-06-01 17:10	Moved task from inbox to done
+changelog
+:2025-05-11 21:26	Created task
+:2025-05-11 21:28	Updated task
+:2025-06-01 17:10	Updated task
+:2025-06-01 17:10	Moved task from inbox to done

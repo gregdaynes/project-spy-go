@@ -18,11 +18,10 @@ An alternative which would be easier to implement than simultaneous dialogs is a
 
 I went with ctrl-b to reopen the last closed task. I expect this to change but feels ok for now.
 
----
-
-2025-04-09 21:46	Created task
-2025-04-09 23:18	Updated task
-2025-04-09 23:18	Moved task from inbox to in-progress
-2025-04-09 23:28	Updated task
-2025-04-09 23:28	Updated task
-2025-04-09 23:28	Moved task from in-progress to done
+changelog
+:2025-04-09 21:46	Created task
+:2025-04-09 23:18	Updated task
+:2025-04-09 23:18	Moved task from inbox to in-progress
+:2025-04-09 23:28	Updated task
+:2025-04-09 23:28	Updated task
+:2025-04-09 23:28	Moved task from in-progress to done

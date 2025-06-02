@@ -1,7 +1,6 @@
 Setup tasks on app
 ===
 
----
-
-2025-02-19 21:26	Created task
-2025-03-23 22:57	Moved task from backlog to done
+changelog
+:2025-02-19 21:26	Created task
+:2025-03-23 22:57	Moved task from backlog to done

@@ -13,10 +13,9 @@ While I'm not opposed to this idea, the problem of being able to click away afte
 
 Something for the future may be to have multiple tasks open at the same time?
 
----
-
-2025-03-28 21:46	Created task
-2025-03-29 23:00	Updated task
-2025-03-29 23:00	Moved task from backlog to inbox
-2025-04-09 21:41	Updated task
-2025-04-09 21:41	Moved task from inbox to done
+changelog
+:2025-03-28 21:46	Created task
+:2025-03-29 23:00	Updated task
+:2025-03-29 23:00	Moved task from backlog to inbox
+:2025-04-09 21:41	Updated task
+:2025-04-09 21:41	Moved task from inbox to done

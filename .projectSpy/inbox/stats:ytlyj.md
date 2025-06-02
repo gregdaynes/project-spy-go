@@ -52,11 +52,11 @@ this works as a line chart with x being day and y being number of task files - w
 
 
 
----
-
-2025-03-28 21:58	Created task
-2025-03-28 21:58	Updated task
-2025-03-28 21:59	Updated task
-2025-03-29 23:01	Updated task
-2025-03-29 23:01	Moved task from backlog to inbox
-2025-04-11 21:46	Updated task
+changelog
+:2025-03-28 21:58	Created task
+:2025-03-28 21:58	Updated task
+:2025-03-28 21:59	Updated task
+:2025-03-29 23:01	Updated task
+:2025-03-29 23:01	Moved task from backlog to inbox
+:2025-04-11 21:46	Updated task
+:

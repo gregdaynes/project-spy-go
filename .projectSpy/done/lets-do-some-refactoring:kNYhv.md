@@ -12,8 +12,7 @@ Lets start off with reducing complexity of a few things:
 - task lanes setting up watchers should likely be separated.
 4) rework handler files
 
----
-
-2025-03-27 09:55	Updated task
-2025-03-27 19:57	Updated task
-2025-03-27 19:57	Moved task from in-progress to done
+changelog
+:2025-03-27 09:55	Updated task
+:2025-03-27 19:57	Updated task
+:2025-03-27 19:57	Moved task from in-progress to done

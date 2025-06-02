@@ -10,10 +10,9 @@ Maybe order is exactly that, the order - so if something is placed as 2 - it is 
 
 If 2 tasks have the same, then order by priority, and then modified, then by random
 
----
-
-2025-03-29 23:08	Created task
-2025-04-02 21:24	Updated task
-2025-04-02 21:24	Moved task from inbox to in-progress
-2025-04-02 22:15	Updated task
-2025-04-02 22:15	Moved task from in-progress to done
+changelog
+:2025-03-29 23:08	Created task
+:2025-04-02 21:24	Updated task
+:2025-04-02 21:24	Moved task from inbox to in-progress
+:2025-04-02 22:15	Updated task
+:2025-04-02 22:15	Moved task from in-progress to done
