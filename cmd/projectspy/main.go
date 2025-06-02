@@ -21,6 +21,7 @@ import (
 )
 
 type application struct {
+	dev           bool
 	debug         bool
 	logger        *slog.Logger
 	templateCache map[string]*template.Template
@@ -31,6 +32,7 @@ type application struct {
 }
 
 func main() {
+	dev := flag.Bool("dev", false, "Dev mode")
 	port := flag.String("port", "0", "HTTP network port to listen on")
 	debug := flag.Bool("debug", false, "Enable debug mode")
 	init := flag.Bool("init", false, "Initialize the project")
@@ -62,7 +64,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	templateCache, err := web.NewTemplateCache()
+	templateCache, err := web.NewTemplateCache(dev)
 	if err != nil {
 		logger.Error(err.Error())
 		os.Exit(1)
@@ -83,6 +85,7 @@ func main() {
 	task.ListTasks(taskLanes)
 
 	app := &application{
+		dev:           *dev,
 		debug:         *debug,
 		logger:        logger,
 		templateCache: templateCache,
@@ -101,7 +104,6 @@ func main() {
 		WriteTimeout: time.Second * 10,
 	}
 
-	// logger.Info("starting server", slog.String("port", *port))
 	l, err := net.Listen("tcp", ":"+*port)
 	if err != nil {
 		log.Fatal(err)
@@ -110,9 +112,11 @@ func main() {
 	prt := fmt.Sprint(l.Addr().(*net.TCPAddr).Port)
 	fmt.Printf("Project Spy is running\nhttp://localhost:%v", prt)
 
-	err = browser.Open("http://localhost:" + prt)
-	if err != nil {
-		log.Fatal(err)
+	if !*dev {
+		err = browser.Open("http://localhost:" + prt)
+		if err != nil {
+			log.Fatal(err)
+		}
 	}
 
 	log.Fatal(srv.Serve(l))

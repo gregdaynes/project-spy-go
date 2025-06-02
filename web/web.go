@@ -36,17 +36,41 @@ type ErrorDialog struct {
 
 var functions = template.FuncMap{}
 
-func NewTemplateCache() (map[string]*template.Template, error) {
+func NewTemplateCache(devMode *bool) (map[string]*template.Template, error) {
 	cache := map[string]*template.Template{}
 
-	patterns := []string{
-		"html/base.tmpl",
-		"html/partials/*.tmpl",
-	}
+	var templateSet *template.Template
+	var err error
 
-	templateSet, err := template.New("app").Funcs(functions).ParseFS(Files, patterns...)
-	if err != nil {
-		return nil, err
+	if *devMode {
+		files := []string{
+			"./web/html/base.tmpl",
+			"./web/html/partials/confirm-dialog.tmpl",
+			"./web/html/partials/error-dialog.tmpl",
+			"./web/html/partials/filter.tmpl",
+			"./web/html/partials/info-dialog.tmpl",
+			"./web/html/partials/lane.tmpl",
+			"./web/html/partials/lanes.tmpl",
+			"./web/html/partials/new-task.tmpl",
+			"./web/html/partials/panel-about.tmpl",
+			"./web/html/partials/panel-info.tmpl",
+			"./web/html/partials/task-card.tmpl",
+			"./web/html/partials/task.tmpl",
+		}
+		templateSet, err = template.ParseFiles(files...)
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		patterns := []string{
+			"html/base.tmpl",
+			"html/partials/*.tmpl",
+		}
+
+		templateSet, err = template.New("app").Funcs(functions).ParseFS(Files, patterns...)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	cache["app"] = templateSet

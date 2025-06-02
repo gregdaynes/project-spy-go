@@ -1,3 +1,7 @@
+.PHONY: dev
+dev:
+	go run ./cmd/projectspy -dev -port=4000
+
 .PHONY: run
 run:
 	go run ./cmd/projectspy -port=4000
