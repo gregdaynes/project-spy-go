@@ -4,9 +4,11 @@ import (
 	"crypto/sha1"
 	"encoding/hex"
 	"encoding/json"
+	"io"
 	"log"
 	"net/http"
 	"os"
+	"path/filepath"
 	"regexp"
 	"slices"
 	"strconv"
@@ -72,7 +74,7 @@ func (app *application) archiveConfirm(w http.ResponseWriter, r *http.Request) {
 	// check if new file already exists, if so, append an incrementing number to the filename
 	i := 1
 	for {
-		_, err := os.Stat(filepath("_archive", filename+".md"))
+		_, err := os.Stat(makeFilePath("_archive", filename+".md"))
 		if err != nil {
 			break
 		}
@@ -86,7 +88,7 @@ func (app *application) archiveConfirm(w http.ResponseWriter, r *http.Request) {
 
 	go func() {
 		app.eventBus.Subscribe("remove", "archiveRemove", waitForWrite)
-		err := os.Rename(filepath(t.Lane, t.Filename), filepath("_archive", filename))
+		err := os.Rename(makeFilePath(t.Lane, t.Filename), makeFilePath("_archive", filename))
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -114,7 +116,7 @@ func (app *application) createTask(w http.ResponseWriter, r *http.Request) {
 	// check if file already exists, if so, append an incrementing number to the filename
 	i := 1
 	for {
-		_, err := os.Stat(filepath(qLane, filename+".md"))
+		_, err := os.Stat(makeFilePath(qLane, filename+".md"))
 		if err != nil {
 			break
 		}
@@ -124,7 +126,69 @@ func (app *application) createTask(w http.ResponseWriter, r *http.Request) {
 
 	filename += ".md"
 
-	path := filepath(qLane, filename)
+	path := makeFilePath(qLane, filename)
+
+	ch := make(chan int)
+	waitForWrite := wait(ch, qLane+"/"+filename)
+
+	go func() {
+		app.eventBus.Subscribe("update", "createTask", waitForWrite)
+		err := os.WriteFile(path, []byte(content), 0644)
+		if err != nil {
+			log.Fatal(err)
+		}
+	}()
+
+	<-ch
+	app.eventBus.Unsubscribe("update", "createTask")
+
+	http.Redirect(w, r, "/", http.StatusSeeOther)
+}
+
+func (app *application) attachFile(w http.ResponseWriter, r *http.Request) {
+	r.ParseMultipartForm(1024 * 32) // store up to 32mb in memory
+
+	attachment, fileHeader, err := r.FormFile("files[]")
+	defer attachment.Close()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	ext := filepath.Ext(fileHeader.Filename)
+	safeName := slug.Make(fileHeader.Filename)
+	uId := util.GenerateId(safeName)
+	attachmentName := safeName + ":" + uId + ext
+
+	qLane := r.FormValue("lane")
+
+	filePath := makeFilePath("_files", attachmentName)
+	os.MkdirAll(makeDirPath("_files"), os.ModePerm)
+
+	f, err := os.OpenFile(filePath, os.O_WRONLY|os.O_CREATE, 0666)
+	defer f.Close()
+	io.Copy(f, attachment)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	filename := slug.Make(strings.TrimSuffix(fileHeader.Filename, ext))
+	content := fileHeader.Filename + "\n===\n\n"
+	content = appendChangelog(content, "Created task from file")
+
+	// check if file already exists, if so, append an incrementing number to the filename
+	i := 1
+	for {
+		_, err := os.Stat(makeFilePath(qLane, filename+":"+uId+".md"))
+		if err != nil {
+			break
+		}
+		filename = filename + "-" + strconv.Itoa(i) + ":" + uId
+		i++
+	}
+
+	filename += ":" + uId + ".md"
+
+	path := makeFilePath(qLane, filename)
 
 	ch := make(chan int)
 	waitForWrite := wait(ch, qLane+"/"+filename)
@@ -189,7 +253,7 @@ func (app *application) deleteConfirm(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	path := filepath(lane, filename)
+	path := makeFilePath(lane, filename)
 
 	ch := make(chan int)
 	waitForWrite := wait(ch, t.RelativePath)
@@ -300,7 +364,7 @@ func (app *application) update(w http.ResponseWriter, r *http.Request) {
 	qLane := r.PathValue("lane")
 	qFile := r.PathValue("filename")
 
-	oldPath := filepath(qLane, qFile)
+	oldPath := makeFilePath(qLane, qFile)
 	_, err := os.ReadFile(oldPath)
 	if err != nil {
 		log.Fatal("file not found")
@@ -329,7 +393,7 @@ func (app *application) update(w http.ResponseWriter, r *http.Request) {
 		// check file already exists, if so, append an incrementing number to the filename
 		i := 1
 		for {
-			_, err := os.Stat(filepath(newLane, filename+".md"))
+			_, err := os.Stat(makeFilePath(newLane, filename+".md"))
 			if err != nil {
 				break
 			}
@@ -346,7 +410,7 @@ func (app *application) update(w http.ResponseWriter, r *http.Request) {
 	}
 
 	filename += ".md"
-	path = filepath(newLane, filename)
+	path = makeFilePath(newLane, filename)
 
 	ch := make(chan int)
 	waitForWrite := wait(ch, newLane+"/"+filename)
@@ -458,13 +522,17 @@ func (app *application) getTaskById(tid string) (t task.Task, ok bool) {
 	return app.taskLanes[iL].Tasks[iT], true
 }
 
-func filepath(lane, filename string) string {
+func makeFilePath(dir, filename string) string {
+	return makeDirPath(dir) + "/" + filename
+}
+
+func makeDirPath(dir string) string {
 	cwd, err := os.Getwd()
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	return cwd + "/.projectSpy/" + lane + "/" + filename
+	return cwd + "/.projectSpy/" + dir
 }
 
 func wait(ch chan int, path string) func(string) {

@@ -27,6 +27,7 @@ func (app *application) routes() http.Handler {
 	mux.Handle("POST /archive/{lane}/{filename}", http.HandlerFunc(app.archiveConfirm))
 	mux.Handle("GET /manifest.json", http.HandlerFunc(app.manifest))
 	mux.Handle("GET /{tid}", http.HandlerFunc(app.viewById))
+	mux.Handle("POST /attach-file", http.HandlerFunc(app.attachFile))
 
 	return mux
 }

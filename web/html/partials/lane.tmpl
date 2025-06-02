@@ -1,5 +1,5 @@
 {{ define "lane" }}
-	<task-lane id="lane-{{ .Slug }}">
+	<task-lane id="lane-{{ .Slug }}" data-name="{{ .Slug }}">
 		<task-lane-header>
 			<label for="lane-{{ .Slug }}">
 				<h2>{{ .Title  }}{{ if .Count}} ({{ .Count  }}){{end}}</h2>

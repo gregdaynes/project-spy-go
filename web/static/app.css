@@ -521,3 +521,8 @@
 		place-content: center;
 	}
 }
+
+.dragover {
+	outline: 2px solid green;
+	outline-offset: -1px
+}
