@@ -561,16 +561,21 @@ func hash(s string) string {
 }
 
 func appendChangelog(content, change string) string {
-	last := strings.Split(content, "\n")[len(strings.Split(content, "\n"))-1]
-	re := regexp.MustCompile(`\d{4}-\d{2}-\d{2} \d{2}:\d{2}\t.*`)
+	re := regexp.MustCompile(`(?m)^changelog$\n(\:.*$[\n]?)*`)
 	timestamp := time.Now().Format("2006-01-02 15:04")
 
 	content = strings.TrimSpace(content)
 
-	if re.MatchString(last) {
-		content += "\n" + timestamp + "\t" + change
+	if re.MatchString(content) {
+		changelog := re.Find([]byte(content))
+		str := string(changelog)
+		entry := "\n:" + timestamp + "\t" + change + "\n"
+		str += entry
+		changelog = re.ReplaceAll([]byte(content), []byte(str))
+
+		content = string(changelog)
 	} else {
-		content += "\n\n---\n\n" + timestamp + "\t" + change
+		content += "\nchangelog\n:" + timestamp + "\t" + change
 	}
 
 	return content

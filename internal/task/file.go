@@ -143,7 +143,7 @@ func parseTitle(title string) (parsedTitle string) {
 }
 
 func parseDescription(text string) (output string) {
-	reChangelog := regexp.MustCompile(`\n---\n\n(?:\d{4}-\d{2}-\d{2} \d{2}:\d{2}\t.*\n?)+`)
+	reChangelog := regexp.MustCompile(`\nchangelog\n(?:\:\d{4}-\d{2}-\d{2} \d{2}:\d{2}\t.*\n?)+`)
 	reHeader := regexp.MustCompile(`.+\n===+\n|.+\n---+\n|#+\s.+\n`)
 	output = text
 	output = reChangelog.ReplaceAllString(output, "")
