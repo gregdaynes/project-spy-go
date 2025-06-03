@@ -19,7 +19,7 @@ func (app *application) routes() http.Handler {
 	mux.Handle("GET /file/{filename}", http.HandlerFunc(app.viewFile))
 	mux.Handle("GET /{tid}", http.HandlerFunc(app.viewById))
 	mux.Handle("GET /info", http.HandlerFunc(app.info))
-	mux.Handle("POST /new", http.HandlerFunc(app.createTask))
+	mux.Handle("POST /new/", http.HandlerFunc(app.createTask))
 	mux.Handle("GET /new", http.HandlerFunc(app.newTask))
 	mux.Handle("GET /view/{lane}/{filename}", http.HandlerFunc(app.view))
 	mux.Handle("POST /update/{lane}/{filename}", http.HandlerFunc(app.update))

@@ -106,6 +106,24 @@ func (app *application) createTask(w http.ResponseWriter, r *http.Request) {
 	qContent := r.FormValue("content")
 	qLane := r.FormValue("lane")
 
+	if qName == "" {
+		data := app.newTemplateData(r)
+		data.SearchData = search.Data(app.taskLanes)
+		data.TaskLanes = task.RenderTaskLanes(app.config, app.taskLanes)
+
+		t := task.Task{
+			Lane:        qLane,
+			RawContents: qContent,
+		}
+
+		data.CurrentTask = t
+		data.CurrentTask.Lanes = app.taskLanes
+		data.ShowTask = true
+
+		app.render(w, r, http.StatusOK, data)
+		return
+	}
+
 	slug := slug.Make(qName)
 	uId := util.GenerateId(slug)
 

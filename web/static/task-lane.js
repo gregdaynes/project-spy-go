@@ -42,19 +42,46 @@ class TaskLane extends HTMLElement {
 				const dt = e.dataTransfer
 				const files = dt.files
 
-				const fd = new FormData()
-				fd.append('lane', this.getAttribute('data-name'))
+				if (files.length) {
+					const fd = new FormData()
+					fd.append('lane', this.getAttribute('data-name'))
 
-				for (const file of files) {
-					fd.append('files[]', file)
+					for (const file of files) {
+						fd.append('files[]', file)
+					}
+
+					const response = await fetch("/attach-file", {
+						method: "POST",
+						body: fd,
+					});
+
+					window.location.href = response.url;
 				}
 
-				const response = await fetch("/attach-file", {
-					method: "POST",
-					body: fd,
-				});
+				if (dt.getData("text") !== "") {
+					//  could we post to an endpoint and have it render the task view with content filled out?
+					const lane = this.getAttribute('data-name')
+					const content = dt.getData("text")
 
-				window.location.href = response.url;
+					const form = document.createElement("form")
+					form.setAttribute('method', 'POST')
+					form.setAttribute('action', '/new/')
+
+					const inputLane = document.createElement('input')
+					inputLane.setAttribute('type', 'hidden')
+					inputLane.setAttribute('name', 'lane')
+					inputLane.setAttribute('value', lane)
+					form.appendChild(inputLane)
+
+					const inputContent = document.createElement('input')
+					inputContent.setAttribute('type', 'hidden')
+					inputContent.setAttribute('name', 'content')
+					inputContent.setAttribute('value', content)
+					form.appendChild(inputContent)
+
+					document.body.appendChild(form);
+					form.submit();
+				}
 
 				break
 			case 'dragover':
