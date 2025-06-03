@@ -84,7 +84,30 @@ func parseFile(fp string) (task Task, err error) {
 	description := parseDescription(task.RawContents)
 	task.Description = description
 
+	task.Files = parseAttachments(task.RawContents)
+
 	return task, nil
+}
+
+func parseAttachments(text string) (output []File) {
+	re := regexp.MustCompile(`(?m)^attachment$\n(\:.*$[\n]?)*`)
+	var files []File
+
+	for _, match := range re.FindAll([]byte(text), -1) {
+		str := string(match)
+		str = strings.TrimPrefix(str, "attachment\n")
+		strs := strings.Split(str, "\n")
+
+		for _, entry := range strs {
+			name := strings.TrimPrefix(entry, ":")
+			files = append(files, File{
+				Name: name,
+				Path: "file/" + name,
+			})
+		}
+	}
+
+	return files
 }
 
 func priority(title string) (priority int) {
@@ -144,10 +167,12 @@ func parseTitle(title string) (parsedTitle string) {
 
 func parseDescription(text string) (output string) {
 	reChangelog := regexp.MustCompile(`\nchangelog\n(?:\:\d{4}-\d{2}-\d{2} \d{2}:\d{2}\t.*\n?)+`)
+	reAttachment := regexp.MustCompile(`(?m)^attachment$\n(\:.*$[\n]?)*`)
 	reHeader := regexp.MustCompile(`.+\n===+\n|.+\n---+\n|#+\s.+\n`)
 	output = text
 	output = reChangelog.ReplaceAllString(output, "")
 	output = reHeader.ReplaceAllString(output, "")
+	output = reAttachment.ReplaceAllString(output, "")
 	output = strings.TrimSpace(output)
 	output = strings.Split(output, "\n")[0]
 

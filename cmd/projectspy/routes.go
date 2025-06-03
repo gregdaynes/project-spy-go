@@ -16,6 +16,7 @@ func (app *application) routes() http.Handler {
 		mux.Handle("GET /static/", http.FileServerFS(web.Files))
 	}
 	mux.Handle("GET /", http.HandlerFunc(app.home))
+	mux.Handle("GET /file/{filename}", http.HandlerFunc(app.viewFile))
 	mux.Handle("GET /{tid}", http.HandlerFunc(app.viewById))
 	mux.Handle("GET /info", http.HandlerFunc(app.info))
 	mux.Handle("POST /new", http.HandlerFunc(app.createTask))

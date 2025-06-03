@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"crypto/sha1"
 	"encoding/hex"
 	"encoding/json"
@@ -174,6 +175,7 @@ func (app *application) attachFile(w http.ResponseWriter, r *http.Request) {
 	filename := slug.Make(strings.TrimSuffix(fileHeader.Filename, ext))
 	content := fileHeader.Filename + "\n===\n\n"
 	content = appendChangelog(content, "Created task from file")
+	content = appendAttachment(content, attachmentName)
 
 	// check if file already exists, if so, append an incrementing number to the filename
 	i := 1
@@ -204,7 +206,8 @@ func (app *application) attachFile(w http.ResponseWriter, r *http.Request) {
 	<-ch
 	app.eventBus.Unsubscribe("update", "createTask")
 
-	http.Redirect(w, r, "/", http.StatusSeeOther)
+	// http.Redirect(w, r, "/", http.StatusSeeOther)
+	http.Redirect(w, r, "/view/"+qLane+"/"+filename, http.StatusSeeOther)
 }
 
 func (app *application) delete(w http.ResponseWriter, r *http.Request) {
@@ -483,6 +486,28 @@ func (app *application) viewById(w http.ResponseWriter, r *http.Request) {
 	app.render(w, r, http.StatusOK, data)
 }
 
+func (app *application) viewFile(w http.ResponseWriter, r *http.Request) {
+	path := r.PathValue("filename")
+	filename := filepath.Base(path)
+	fullPath := makeFilePath("_files", filename)
+
+	filebytes, err := os.ReadFile(fullPath)
+	if err != nil {
+		log.Fatal(err)
+	}
+	contentType := http.DetectContentType(filebytes)
+
+	w.Header().Set("Content-Type", contentType)
+	w.WriteHeader(http.StatusOK)
+
+	buf := bytes.NewBuffer(filebytes)
+
+	_, err = buf.WriteTo(w)
+	if err != nil {
+		return
+	}
+}
+
 func (app *application) getTask(lane, filename string) (t task.Task, ok bool) {
 	i := slices.IndexFunc(app.taskLanes, func(l task.Lane) bool {
 		return l.Name == lane
@@ -575,7 +600,27 @@ func appendChangelog(content, change string) string {
 
 		content = string(changelog)
 	} else {
-		content += "\nchangelog\n:" + timestamp + "\t" + change
+		content += "\n\nchangelog\n:" + timestamp + "\t" + change
+	}
+
+	return content
+}
+
+func appendAttachment(content, filename string) string {
+	re := regexp.MustCompile(`(?m)^attachment$\n(\:.*$[\n]?)*`)
+
+	content = strings.TrimSpace(content)
+
+	if re.MatchString(content) {
+		statement := re.Find([]byte(content))
+		str := string(statement)
+		entry := "\n:" + filename + "\n"
+		str += entry
+		statement = re.ReplaceAll([]byte(content), []byte(str))
+
+		content = string(statement)
+	} else {
+		content += "\n\nattachment\n:" + filename
 	}
 
 	return content

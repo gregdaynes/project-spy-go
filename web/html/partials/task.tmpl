@@ -19,6 +19,18 @@
         <textarea name="content" id="content" form="updateForm">{{ .RawContents }}</textarea>
       </dialog-main>
 
+			{{ if .Files }}
+			<details>
+				<summary>Attachments</summary>
+
+				<ul>
+					{{ range .Files }}
+						<li><a target="_blank" href="/{{ .Path }}">{{.Name}}</a></li>
+					{{ end }}
+				</ul>
+			</details>
+			{{ end }}
+
       <dialog-details>
 				{{ if .ID }}
 					<task-id>#{{ .ID }}</task-id>

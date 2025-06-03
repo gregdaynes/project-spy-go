@@ -7,6 +7,11 @@ import (
 	"github.com/gosimple/slug"
 )
 
+type File struct {
+	Path string
+	Name string
+}
+
 type Task struct {
 	ID           string
 	Lane         string
@@ -15,6 +20,7 @@ type Task struct {
 	Description  string
 	Priority     int
 	Tags         []string
+	Files        []File
 	RelativePath string
 	Filename     string
 	ModifiedTime time.Time
